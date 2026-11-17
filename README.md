@@ -1,6 +1,6 @@
 # 实习分享会
 
-在线演示：https://slides.liangzhicong.com/
+在线演示：https://sharing.internship.liangzhicong.com/
 
 面向大一同学的HTML演示稿。打开index.html，或通过GitHub Pages访问。
 

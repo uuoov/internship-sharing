@@ -58,6 +58,13 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 @media(max-width:1100px){.workbench-open .masthead{padding:0 24px}.workbench-open .controls{padding:0 24px 16px}.workbench-open .stage-area{padding:16px 24px 24px}}
 @media(max-width:700px){.quick-nav{right:12px;bottom:12px;padding:4px;font-size:12px}.quick-nav button{height:30px;min-width:30px;padding:4px 6px}.quick-nav .quick-count{min-width:64px}.workbench-open .app{grid-template-rows:64px minmax(0,1fr)80px}.workbench-open .masthead{padding:0 16px}.workbench-open .controls{padding:0 12px 12px}.workbench-open .stage-area{padding:8px}.workbench-open .header-actions button span{display:none}.image-tools{gap:0;padding:4px;left:0;transform:none}.image-tools button{padding:4px 8px}.image-tools span{min-width:36px}.image-gallery{padding-right:4px;margin-right:2px}.zoom-surface{padding:64px 12px 48px}.image-dialog .close-image{padding:10px}.image-hint{left:0;bottom:0;max-width:100%;font-size:11px}}
 @media print{.quick-nav{display:none!important}.app,.workbench-open .app{display:block}.frame,.workbench-open .frame{border-radius:0;box-shadow:none}.stage-area,.workbench-open .stage-area{padding:0}}
+@media (max-width: 700px) {
+  .workbench-open #add-page-button span { display: inline; white-space: nowrap; }
+  .workbench-open #add-page-button svg { display: none; }
+}
+@media (max-width: 440px) {
+  .workbench-open .masthead #insert-image-button span { display: none; }
+}
 .site-links{display:flex;gap:14px;align-items:center;z-index:4}.site-links.align-right{justify-content:flex-end}.site-link{display:inline-flex;align-items:center;gap:12px;white-space:nowrap;color:#9c4b32;text-decoration:none;border:1.5px solid #b9553852;border-radius:8px;padding:7px 16px;font-size:30px;line-height:38px;background:#fbfaf7e8;box-shadow:0 2px 0 #b9553810}.site-link:hover{background:#f2e7dc;border-color:#b95538}.site-link>span[aria-hidden]{font-size:25px;color:#b95538}.site-link:focus-visible,.image-link:focus-visible{outline:3px solid #b95538;outline-offset:4px}.linked-image .image-link{display:block;position:absolute;inset:0;cursor:pointer}.linked-image .image-link:hover{outline:3px solid #b9553866;outline-offset:-3px}.linked-image .picture-zoom{position:absolute;right:10px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:8px;border-radius:8px;background:#fbfaf7ed;color:#51483f;box-shadow:0 1px 8px #28242026;cursor:zoom-in;opacity:.85}.linked-image .picture-zoom:hover{opacity:1;background:#fff}.linked-image .picture-zoom svg{width:25px;height:25px}.text-shape .title-site-link{color:inherit;text-decoration:underline;text-decoration-color:#b9553866;text-decoration-thickness:2px;text-underline-offset:8px}.text-shape .title-site-link:hover{text-decoration-color:#b95538}.edit-mode .site-link{cursor:text}
 .user-image {
   position: absolute;
@@ -166,6 +173,46 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   .workbench-open .brand-mark { display: none; }
 }
 @media print { #publish-dialog { display: none !important; } }
+.user-created-page {
+  background: #fbfaf7;
+  color: #282420;
+  padding: 90px 150px 80px;
+}
+.user-created-page [data-page-title],
+.user-created-page [data-page-body] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.user-created-page [data-page-title] {
+  min-height: 90px;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.24;
+}
+.user-created-page [data-page-body] {
+  margin-top: 50px;
+  min-height: 150px;
+  font-size: 44px;
+  line-height: 1.55;
+}
+.edit-mode .user-created-page [data-editable] { cursor: text; }
+.edit-mode .user-created-page [data-editable]:hover {
+  outline: 2px dashed #b95538;
+  outline-offset: 8px;
+}
+.edit-mode .user-created-page [data-editable]:focus {
+  outline: 3px solid #b95538;
+  outline-offset: 8px;
+}
+.edit-mode .user-created-page [data-editable]:empty::before,
+.edit-mode .user-created-page [data-editable]:has(>br:only-child)::before {
+  content: attr(data-placeholder);
+  color: #8c837c;
+  pointer-events: none;
+}
 </style>
 </head>
 <body data-source="6e0b0f4eeca56c3887367021a8eefe7f65a0aba2c4432d3872bd2bcac9d003c7" data-start="1">
@@ -176,6 +223,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   <nav class="chapters" aria-label="分享章节"><button data-goto="4">目的</button><button data-goto="6">机会</button><button data-goto="9">简历</button><button data-goto="14">工作</button><button data-goto="15">职场</button></nav>
   <div class="header-actions">
     <button id="edit-button" aria-pressed="false" title="编辑页面（E）" aria-label="编辑页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"/></svg><span id="edit-label">编辑页面</span></button>
+    <button id="add-page-button" title="在当前页后新增页面" aria-label="新增页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 12h8m-4-4v8"/></svg><span>新增页面</span></button>
     <button id="insert-image-button" title="在当前页插入图片" aria-label="插入图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 3 3 4-4 5 5"/></svg><span>插入图片</span></button>
     <input id="image-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="选择要插入的图片" hidden>
     <button id="remove-image-button" title="删除选中图片（Delete）" aria-label="删除选中图片" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>删除图片</span></button>
@@ -189,7 +237,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   <aside class="notes" id="notes-panel" hidden aria-label="讲稿面板"><div class="panel-head"><h2>本页讲稿</h2><button id="close-notes" aria-label="关闭讲稿"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="notes-meta" class="notes-meta"></div><div id="notes-content" class="notes-content" contenteditable="false"></div></aside>
 </main>
 <footer class="controls">
-  <div class="current-info"><p id="current-title">实习分享</p><span>大一分享会 · 约40分钟</span></div>
+  <div class="current-info"><p id="current-title">实习分享</p></div>
   <div class="pager" aria-label="翻页"><button id="prev-button" title="上一页（←）" aria-label="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><label class="page-number"><span class="sr-only">跳转到页码</span><input id="page-input" type="number" min="1" max="25" value="1" aria-label="当前页码"><span>/ 25</span></label><button id="next-button" title="下一页（→）" aria-label="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div>
   <div class="tools"><button id="overview-button" title="目录（O）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="short-label">目录</span></button><button id="notes-button" aria-pressed="false" title="讲稿（N）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5zM9 7h6M9 11h6M9 15h3"/></svg><span class="short-label">讲稿</span></button><button id="fullscreen-button" aria-pressed="false" title="全屏放映（F）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg><span class="short-label">放映</span></button><button id="help-button" class="help-tool" title="操作说明（?）" aria-label="操作说明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 8a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4M12 16h.01"/></svg></button></div>
 </footer>
@@ -197,7 +245,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 <nav class="quick-nav" aria-label="演示翻页"><button id="quick-prev" aria-label="上一页" title="上一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><button id="quick-count" class="quick-count" aria-label="选择页面">01 / 25</button><button id="quick-next" aria-label="下一页" title="下一页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button><button id="workspace-button" class="quick-tools" title="展开讲稿、编辑和全屏工具" aria-label="展开工具"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg><span>工具</span></button></nav>
 <div id="progress" class="progress" role="progressbar" aria-label="演示进度" aria-valuemin="1" aria-valuemax="25" aria-valuenow="1"><span id="progress-value"></span></div>
 <div class="present-hint">方向键翻页 · 按Esc退出放映</div><div id="page-announcement" class="sr-only" aria-live="polite"></div><div id="toast" class="toast" role="status" hidden></div>
-<div id="overview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="overview-title" hidden><div class="modal-panel"><div class="panel-head"><h2 id="overview-title">分享目录<small style="color:#a6a6a2;font-size:14px;margin-left:12px">25页</small></h2><button data-close aria-label="关闭目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><input id="overview-search" class="overview-search" type="search" placeholder="找一页内容…" aria-label="搜索页面"><div class="overview-list"><button data-overview-index="0"><span class="index">01</span><span class="label">实习分享<small>开场</small></span></button><button data-overview-index="1"><span class="index">02</span><span class="label">介绍<small>开场</small></span></button><button data-overview-index="2"><span class="index">03</span><span class="label">目录<small>开场</small></span></button><button data-overview-index="3"><span class="index">04</span><span class="label">实习目的<small>目的</small></span></button><button data-overview-index="4"><span class="index">05</span><span class="label">先看自己能拿出多长时间<small>目的</small></span></button><button data-overview-index="5"><span class="index">06</span><span class="label">第一段，可以从相关岗位起步<small>机会</small></span></button><button data-overview-index="6"><span class="index">07</span><span class="label">投递渠道<small>机会</small></span></button><button data-overview-index="7"><span class="index">08</span><span class="label">侧重点<small>机会</small></span></button><button data-overview-index="8"><span class="index">09</span><span class="label">Resume Coach - 简历分析与修改<small>简历</small></span></button><button data-overview-index="9"><span class="index">10</span><span class="label">JD<small>简历</small></span></button><button data-overview-index="10"><span class="index">11</span><span class="label">WonderCV<small>简历</small></span></button><button data-overview-index="11"><span class="index">12</span><span class="label">简历先让人看见相关证据<small>简历</small></span></button><button data-overview-index="12"><span class="index">13</span><span class="label">STAR原则<small>简历</small></span></button><button data-overview-index="13"><span class="index">14</span><span class="label">实习经历<small>工作</small></span></button><button data-overview-index="14"><span class="index">15</span><span class="label">接任务，先把四件事问清<small>职场</small></span></button><button data-overview-index="15"><span class="index">16</span><span class="label">六点没做完，先分清优先级<small>职场</small></span></button><button data-overview-index="16"><span class="index">17</span><span class="label">带着方案，找能决定的人确认<small>职场</small></span></button><button data-overview-index="17"><span class="index">18</span><span class="label">AI做完之后，还得自己看一遍<small>职场</small></span></button><button data-overview-index="18"><span class="index">19</span><span class="label">中途同步，交付分清三类<small>职场</small></span></button><button data-overview-index="19"><span class="index">20</span><span class="label">沟通清楚，关键事项留文字<small>职场</small></span></button><button data-overview-index="20"><span class="index">21</span><span class="label">多沟通<small>职场</small></span></button><button data-overview-index="21"><span class="index">22</span><span class="label">解决过的问题，要留下方法<small>职场</small></span></button><button data-overview-index="22"><span class="index">23</span><span class="label">主业之外，给自己留点时间<small>职场</small></span></button><button data-overview-index="23"><span class="index">24</span><span class="label">起步时，很多问题都可以开口问<small>职场</small></span></button><button data-overview-index="24"><span class="index">25</span><span class="label">交流与联系<small>交流</small></span></button><p class="no-result" id="no-result" hidden>没有找到这页，换个关键词试试。</p></div></div></div>
+<div id="overview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="overview-title" hidden><div class="modal-panel"><div class="panel-head"><h2 id="overview-title">分享目录<small style="color:#a6a6a2;font-size:14px;margin-left:12px">25页</small></h2><button data-close aria-label="关闭目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><input id="overview-search" class="overview-search" type="search" placeholder="找一页内容…" aria-label="搜索页面"><div class="overview-list"><button data-overview-index="0" data-overview-page="1"><span class="index">01</span><span class="label"><span class="overview-page-title">实习分享</span><small>开场</small></span></button><button data-overview-index="1" data-overview-page="2"><span class="index">02</span><span class="label"><span class="overview-page-title">介绍</span><small>开场</small></span></button><button data-overview-index="2" data-overview-page="3"><span class="index">03</span><span class="label"><span class="overview-page-title">目录</span><small>开场</small></span></button><button data-overview-index="3" data-overview-page="4"><span class="index">04</span><span class="label"><span class="overview-page-title">实习目的</span><small>目的</small></span></button><button data-overview-index="4" data-overview-page="5"><span class="index">05</span><span class="label"><span class="overview-page-title">先看自己能拿出多长时间</span><small>目的</small></span></button><button data-overview-index="5" data-overview-page="6"><span class="index">06</span><span class="label"><span class="overview-page-title">第一段，可以从相关岗位起步</span><small>机会</small></span></button><button data-overview-index="6" data-overview-page="7"><span class="index">07</span><span class="label"><span class="overview-page-title">投递渠道</span><small>机会</small></span></button><button data-overview-index="7" data-overview-page="8"><span class="index">08</span><span class="label"><span class="overview-page-title">侧重点</span><small>机会</small></span></button><button data-overview-index="8" data-overview-page="9"><span class="index">09</span><span class="label"><span class="overview-page-title">Resume Coach - 简历分析与修改</span><small>简历</small></span></button><button data-overview-index="9" data-overview-page="10"><span class="index">10</span><span class="label"><span class="overview-page-title">JD</span><small>简历</small></span></button><button data-overview-index="10" data-overview-page="11"><span class="index">11</span><span class="label"><span class="overview-page-title">WonderCV</span><small>简历</small></span></button><button data-overview-index="11" data-overview-page="12"><span class="index">12</span><span class="label"><span class="overview-page-title">简历先让人看见相关证据</span><small>简历</small></span></button><button data-overview-index="12" data-overview-page="13"><span class="index">13</span><span class="label"><span class="overview-page-title">STAR原则</span><small>简历</small></span></button><button data-overview-index="13" data-overview-page="14"><span class="index">14</span><span class="label"><span class="overview-page-title">实习经历</span><small>工作</small></span></button><button data-overview-index="14" data-overview-page="15"><span class="index">15</span><span class="label"><span class="overview-page-title">接任务，先把四件事问清</span><small>职场</small></span></button><button data-overview-index="15" data-overview-page="16"><span class="index">16</span><span class="label"><span class="overview-page-title">六点没做完，先分清优先级</span><small>职场</small></span></button><button data-overview-index="16" data-overview-page="17"><span class="index">17</span><span class="label"><span class="overview-page-title">带着方案，找能决定的人确认</span><small>职场</small></span></button><button data-overview-index="17" data-overview-page="18"><span class="index">18</span><span class="label"><span class="overview-page-title">AI做完之后，还得自己看一遍</span><small>职场</small></span></button><button data-overview-index="18" data-overview-page="19"><span class="index">19</span><span class="label"><span class="overview-page-title">中途同步，交付分清三类</span><small>职场</small></span></button><button data-overview-index="19" data-overview-page="20"><span class="index">20</span><span class="label"><span class="overview-page-title">沟通清楚，关键事项留文字</span><small>职场</small></span></button><button data-overview-index="20" data-overview-page="21"><span class="index">21</span><span class="label"><span class="overview-page-title">多沟通</span><small>职场</small></span></button><button data-overview-index="21" data-overview-page="22"><span class="index">22</span><span class="label"><span class="overview-page-title">解决过的问题，要留下方法</span><small>职场</small></span></button><button data-overview-index="22" data-overview-page="23"><span class="index">23</span><span class="label"><span class="overview-page-title">主业之外，给自己留点时间</span><small>职场</small></span></button><button data-overview-index="23" data-overview-page="24"><span class="index">24</span><span class="label"><span class="overview-page-title">起步时，很多问题都可以开口问</span><small>职场</small></span></button><button data-overview-index="24" data-overview-page="25"><span class="index">25</span><span class="label"><span class="overview-page-title">交流与联系</span><small>交流</small></span></button><p class="no-result" id="no-result" hidden>没有找到这页，换个关键词试试。</p></div></div></div>
 <div id="image-modal" class="modal image-modal" role="dialog" aria-modal="true" aria-label="原图预览" hidden><div class="image-dialog"><div id="zoom-viewport" class="zoom-viewport"><div class="zoom-surface"><img id="zoom-image" alt="" draggable="false"></div></div><div class="image-tools" aria-label="原图工具"><div id="image-gallery" class="image-gallery"><button id="gallery-prev" aria-label="上一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><span id="gallery-count">1 / 1</span><button id="gallery-next" aria-label="下一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><button id="zoom-out" aria-label="缩小图片">−</button><span id="zoom-level">适应</span><button id="zoom-in" aria-label="放大图片">＋</button><button id="zoom-fit" aria-label="图片适应窗口">适应</button></div><button class="close-image" data-close aria-label="关闭原图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><span class="image-hint">同页配图可左右切换 · 放大后可拖动 · 按Esc返回</span></div></div>
 <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden><div class="modal-panel help-panel"><div class="panel-head"><h2 id="help-title">轻松开讲</h2><button data-close aria-label="关闭操作说明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="help-rows"><div><span>翻页</span><kbd>← → / 空格</kbd></div><div><span>跳到开场／结束</span><kbd>Home / End</kbd></div><div><span>全屏放映</span><kbd>F</kbd></div><div><span>目录／讲稿／编辑</span><kbd>O / N / E</kbd></div><div><span>返回演示／退出全屏</span><kbd>Esc</kbd></div><p>点“编辑页面”修改文字或讲稿。点“插入图片”选取本地图片，拖动图片可移动，拖动角上的圆点可等比缩放。点“保存HTML”下载含图片的演示文件。</p></div></div></div>
 <dialog id="publish-dialog" aria-labelledby="publish-heading">
@@ -368,14 +416,181 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
 [预留约3分钟现场交流。可以从找岗位、改简历、第一次上班的沟通与相处三个方向接问题。已有话题尽量结合本人经历回答；没有经历过的就直说，不把一家公司的做法当成所有公司的规则。若现场暂时没人发问，可邀请一位同学说说今天最想进一步了解的部分，停顿等待，不额外增加一页Q&amp;A。]
 
 资料出处：36（对应逐页大纲）</div></div>
-<script>// Public slide content is data only. The authored layout and scripts remain in the presentation.
+<script>// Original slide IDs never change. Each added page remembers its insertion anchor.
+window.slidePages = (() => {
+  'use strict';
+  const canvas = document.getElementById('canvas');
+  const sections = new Map(Array.from(canvas.children).filter(el => el.hasAttribute('data-slide')).map(el => [el.dataset.slide, el]));
+  const originalIds = Array.from(sections.keys()).filter(id => /^[1-9]\d*$/.test(id));
+  const customId = /^u-[0-9a-f]{32}$/;
+  const fallbackTitle = '未命名页面';
+  const notes = document.querySelector('.note-source').parentElement;
+  let records = [], prefix = '', announce = () => {}, clock = 0;
+
+  function validatePages(value) {
+    if (!Array.isArray(value)) throw new Error('新增页面列表无效。');
+    const known = new Set(originalIds);
+    return value.map(item => {
+      if (!item || Object.keys(item).length !== 2 || typeof item.id !== 'string' || !customId.test(item.id) ||
+          known.has(item.id) || typeof item.after !== 'string' || !known.has(item.after)) {
+        throw new Error('新增页面的标识或顺序无效。');
+      }
+      known.add(item.id);
+      return { id: item.id, after: item.after };
+    });
+  }
+  function createPage({ id }) {
+    const page = document.createElement('section');
+    page.className = 'slide user-created-page';
+    page.dataset.slide = id;
+    page.dataset.title = fallbackTitle;
+    page.setAttribute('aria-label', fallbackTitle);
+    page.setAttribute('aria-hidden', 'true');
+    page.inert = true;
+    for (const kind of ['title', 'body']) {
+      const field = document.createElement(kind === 'title' ? 'h2' : 'div');
+      field.dataset.editable = id + '-' + kind;
+      field.setAttribute('data-page-' + kind, '');
+      field.contentEditable = document.body.classList.contains('edit-mode') ? 'true' : 'false';
+      field.spellcheck = false;
+      field.setAttribute('aria-label', kind === 'title' ? '页面标题' : '页面正文');
+      field.dataset.placeholder = kind === 'title' ? '输入标题' : '输入正文';
+      page.append(field);
+    }
+    const note = document.createElement('div');
+    note.id = 'note-' + id;
+    note.className = 'note-source';
+    note.hidden = true;
+    notes.append(note);
+    sections.set(id, page);
+    return page;
+  }
+  function refreshTitles() {
+    for (const { id } of records) {
+      const page = sections.get(id);
+      const title = page.querySelector('[data-page-title]').textContent.trim() || fallbackTitle;
+      page.dataset.title = title;
+      page.setAttribute('aria-label', title);
+    }
+  }
+  function applyPages(value) {
+    const ordered = validatePages(value);
+    const desired = new Set(ordered.map(page => page.id));
+    for (const [id, page] of sections) {
+      if (customId.test(id) && !desired.has(id)) {
+        document.getElementById('note-' + id)?.remove();
+        page.remove();
+        sections.delete(id);
+      }
+    }
+    // Replay inserts as linked successors. Move only new or misplaced nodes,
+    // preserving authored videos, existing editable elements and image objects.
+    const next = new Map(originalIds.map((id, index) => [id, originalIds[index + 1]]));
+    ordered.forEach((item, index) => {
+      const page = sections.get(item.id) || createPage(item);
+      page.dataset.pageAfter = item.after;
+      page.dataset.pageSequence = String(index);
+      next.set(item.id, next.get(item.after));
+      next.set(item.after, item.id);
+    });
+    let previous;
+    for (let id = originalIds[0]; id !== undefined; id = next.get(id)) {
+      const page = sections.get(id);
+      if (customId.test(id) && previous.nextElementSibling !== page) previous.after(page);
+      previous = page;
+    }
+    records = ordered;
+    refreshTitles();
+  }
+  const embedded = Array.from(sections.values()).filter(page => customId.test(page.dataset.slide))
+    .sort((a, b) => Number(a.dataset.pageSequence) - Number(b.dataset.pageSequence));
+  applyPages(embedded.map(page => ({ id: page.dataset.slide, after: page.dataset.pageAfter })));
+
+  function readPages() {
+    return records.map(({ id, after }) => ({ id, after }));
+  }
+  function draftPrefix(storeKey) {
+    return storeKey + '-slide-insert/';
+  }
+  function saveOperation(record) {
+    try {
+      const key = prefix + record.id;
+      if (localStorage.getItem(key) === null) {
+        clock = Math.max(Date.now(), clock + 1);
+        localStorage.setItem(key, JSON.stringify({ ...record, time: clock }));
+      }
+      return true;
+    } catch {
+      announce('浏览器未能保存新增页面。请点“保存HTML”保留当前版本。');
+      return false;
+    }
+  }
+  function restoreDraft(storeKey, report) {
+    prefix = draftPrefix(storeKey);
+    if (report) announce = report;
+    const additions = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key?.startsWith(prefix)) continue;
+        const item = JSON.parse(localStorage.getItem(key));
+        if (!item || !customId.test(item.id) || key !== prefix + item.id || !Number.isSafeInteger(item.time) ||
+            typeof item.after !== 'string') throw new Error();
+        clock = Math.max(clock, item.time);
+        if (!sections.has(item.id)) additions.push(item);
+      }
+    } catch {
+      announce('浏览器未能完整读取新增页面草稿。');
+    }
+    additions.sort((a, b) => a.time - b.time || a.id.localeCompare(b.id));
+    const known = new Set(sections.keys()), restored = readPages();
+    // Tabs write a separate immutable record for each page. Resolve dependencies
+    // even if two tabs used the same timestamp or their system clocks differed.
+    let pending = additions;
+    while (pending.length) {
+      const later = [];
+      for (const item of pending) {
+        if (!known.has(item.after)) { later.push(item); continue; }
+        restored.push({ id: item.id, after: item.after });
+        known.add(item.id);
+      }
+      if (later.length === pending.length) { announce('部分页面草稿的插入位置已不存在。'); break; }
+      pending = later;
+    }
+    applyPages(restored);
+  }
+  function insertAfter(slide) {
+    if (!prefix || sections.get(slide?.dataset.slide) !== slide) throw new Error('请选择要插入新页的位置。');
+    const record = { id: 'u-' + crypto.randomUUID().replace(/-/g, ''), after: slide.dataset.slide };
+    applyPages([...records, record]);
+    saveOperation(record);
+    return sections.get(record.id);
+  }
+  function markPublished(storeKey, pages) {
+    const committed = new Set(validatePages(pages).map(page => page.id));
+    prefix = draftPrefix(storeKey);
+    // A pending insert made after the captured snapshot stays a draft in the new revision.
+    // Earlier scopes are retained for other tabs still editing that public version.
+    for (const record of records) if (!committed.has(record.id)) saveOperation(record);
+  }
+  return { readPages, applyPages, validatePages, restoreDraft, insertAfter, refreshTitles, markPublished };
+})();
+
+// Public slide content is data only. The authored layout and scripts remain in the presentation.
 window.slidePublishedDeck = (() => {
   'use strict';
   const initial = 'initial';
   const mediaPath = /^published\/media\/[0-9a-f]{64}\.(?:jpg|png|gif|webp)$/;
-  const textNodes = new Map(Array.from(document.querySelectorAll('[data-editable]'), el => [el.dataset.editable, el]));
-  const noteNodes = new Map(Array.from(document.querySelectorAll('.note-source[id]'), el => [el.id, el]));
-  const slides = new Map(Array.from(document.querySelectorAll('#canvas [data-slide]'), el => [Number(el.dataset.slide), el]));
+  const canvas = document.getElementById('canvas');
+  const pageKey = value => /^\d+$/.test(value) ? Number(value) : value;
+  function liveNodes() {
+    return {
+      texts: new Map(Array.from(document.querySelectorAll('[data-editable]'), el => [el.dataset.editable, el])),
+      notes: new Map(Array.from(document.querySelectorAll('.note-source[id]'), el => [el.id, el])),
+      slides: new Map(Array.from(canvas.querySelectorAll('[data-slide]'), el => [pageKey(el.dataset.slide), el]))
+    };
+  }
+  const authored = liveNodes();
   let revision = initial, baseline, loading;
   let publishedPaths = new Set();
 
@@ -404,16 +619,15 @@ window.slidePublishedDeck = (() => {
     }
     return result;
   }
-  function checkImage(value) {
+  function checkImage(value, allowedPages) {
     requireValue(dictionary(value) && typeof value.id === 'string' && /^[a-f0-9]{32}$/.test(value.id));
     const { id, page, order, name, path, x, y, w, h } = value;
-    const slide = slides.get(page);
-    requireValue(slide && Number.isSafeInteger(order) && order >= 0);
+    requireValue(allowedPages.has(page) && Number.isSafeInteger(order) && order >= 0);
     requireValue(typeof name === 'string' && name.length > 0 && !/[\/\\\u0000-\u001f\u007f]/.test(name));
     requireValue(typeof path === 'string' && mediaPath.test(path));
     requireValue([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0);
     // CSS serializes positions with limited precision. Tolerate only subpixel roundoff at an edge.
-    const bw = slide.clientWidth, bh = slide.clientHeight, epsilon = 0.05;
+    const bw = canvas.clientWidth, bh = canvas.clientHeight, epsilon = 0.05;
     requireValue(x >= -epsilon && y >= -epsilon && x + w <= bw + epsilon && y + h <= bh + epsilon);
     const hundredths = n => Math.round(n * 100) / 100;
     const width = Math.max(0.01, Math.min(bw, hundredths(w)));
@@ -422,16 +636,26 @@ window.slidePublishedDeck = (() => {
       y: Math.max(0, Math.min(bh - height, hundredths(y))), w: width, h: height, name, path };
   }
   function checkManifest(input) {
-    requireValue(dictionary(input) && input.version === 1);
+    requireValue(dictionary(input) && (input.version === 1 || input.version === 2));
     requireValue(typeof input.revision === 'string' && (input.revision === initial || /^[0-9a-f]{32}$/.test(input.revision)));
-    const texts = checkText(input.texts, textNodes), notes = checkText(input.notes, noteNodes);
+    const pages = window.slidePages.validatePages(input.pages === undefined ? [] : input.pages);
+    requireValue(input.version === (pages.length ? 2 : 1));
+    const textKeys = new Set(authored.texts.keys()), noteKeys = new Set(authored.notes.keys());
+    const pageIds = new Set(authored.slides.keys());
+    for (const { id } of pages) {
+      textKeys.add(id + '-title');
+      textKeys.add(id + '-body');
+      noteKeys.add('note-' + id);
+      pageIds.add(id);
+    }
+    const texts = checkText(input.texts, textKeys), notes = checkText(input.notes, noteKeys);
     requireValue(Array.isArray(input.images));
-    const images = input.images.map(checkImage);
+    const images = input.images.map(image => checkImage(image, pageIds));
     requireValue(new Set(images.map(image => image.id)).size === images.length);
-    if (input.revision === initial) requireValue(!images.length && !Object.keys(texts).length && !Object.keys(notes).length);
-    return { version: 1, revision: input.revision, texts, notes, images };
+    if (input.revision === initial) requireValue(!pages.length && !images.length && !Object.keys(texts).length && !Object.keys(notes).length);
+    return { version: input.version, revision: input.revision, texts, notes, images, ...(pages.length ? { pages } : {}) };
   }
-  function attachImage(image) {
+  function attachImage(image, slides) {
     const box = document.createElement('div'), img = document.createElement('img');
     box.className = 'shape user-image';
     box.dataset.userImage = image.id;
@@ -448,11 +672,14 @@ window.slidePublishedDeck = (() => {
   function apply(manifest) {
     // An empty first publication represents the original slides. Keep the draft
     // namespace so work started before this feature remains available.
-    if (!Object.keys(manifest.texts).length && !Object.keys(manifest.notes).length && !manifest.images.length) return;
-    for (const [id, value] of Object.entries(manifest.texts)) textNodes.get(id).textContent = value;
-    for (const [id, value] of Object.entries(manifest.notes)) noteNodes.get(id).textContent = value;
+    if (!manifest.pages?.length && !Object.keys(manifest.texts).length && !Object.keys(manifest.notes).length && !manifest.images.length) return;
+    window.slidePages.applyPages(manifest.pages || []);
+    const nodes = liveNodes();
+    for (const [id, value] of Object.entries(manifest.texts)) nodes.texts.get(id).textContent = value;
+    for (const [id, value] of Object.entries(manifest.notes)) nodes.notes.get(id).textContent = value;
+    window.slidePages.refreshTitles();
     document.querySelectorAll('#canvas .user-image[data-user-image]').forEach(box => box.remove());
-    manifest.images.forEach(attachImage);
+    manifest.images.forEach(image => attachImage(image, nodes.slides));
     document.body.dataset.imageRevision = manifest.revision;
   }
 
@@ -474,13 +701,15 @@ window.slidePublishedDeck = (() => {
     return { path: 'published/media/' + digest + '.' + (mime === 'jpeg' ? 'jpg' : mime), base64 };
   }
   async function capture() {
-    const texts = readText(textNodes, true), notes = readText(noteNodes, false);
+    const nodes = liveNodes();
+    const pages = window.slidePages.readPages();
+    const texts = readText(nodes.texts, true), notes = readText(nodes.notes, false);
     const existingPaths = publishedPaths;
     // Freeze the full click-time snapshot before the first asynchronous image digest.
     const records = Array.from(document.querySelectorAll('#canvas .user-image[data-user-image]'), box => {
       const img = box.querySelector('img');
       requireValue(img, '有一张插入的图片缺少素材。');
-      return { id: box.dataset.userImage, page: Number(box.parentElement.dataset.slide),
+      return { id: box.dataset.userImage, page: pageKey(box.parentElement.dataset.slide),
         order: Number(box.dataset.imageOrder || 0), x: parseFloat(box.style.left), y: parseFloat(box.style.top),
         w: parseFloat(box.style.width), h: parseFloat(box.style.height), name: img.alt || '插入的图片',
         path: img.getAttribute('src') || '' };
@@ -492,14 +721,14 @@ window.slidePublishedDeck = (() => {
         record.path = asset.path;
         if (!existingPaths.has(asset.path)) assets.set(asset.path, asset);
       }
-      images.push(checkImage(record));
+      images.push(checkImage(record, nodes.slides));
     }
     requireValue(new Set(images.map(image => image.id)).size === images.length, '有重复的图片标识，请重新插入重复的图片。');
-    return { content: { texts, notes, images }, assets: Array.from(assets.values()) };
+    return { content: { texts, notes, images, ...(pages.length ? { pages } : {}) }, assets: Array.from(assets.values()) };
   }
-  function contentKey({ texts, notes, images }) {
-    // DOM traversal order is stable even if an external writer reordered object keys.
-    return JSON.stringify([Array.from(textNodes.keys(), key => texts[key]), Array.from(noteNodes.keys(), key => notes[key]), images]);
+  function contentKey({ texts, notes, images, pages = [] }) {
+    const pairs = values => Object.keys(values).sort().map(key => [key, values[key]]);
+    return JSON.stringify([pages, pairs(texts), pairs(notes), images]);
   }
   async function loadPublic() {
     const allowed = ['sharing.internship.liangzhicong.com', 'localhost', '127.0.0.1', '[::1]'];
@@ -534,7 +763,8 @@ window.slidePublishedDeck = (() => {
     const baseRevision = revision, oldBaseline = baseline;
     const { content, assets } = await capture();
     const newRevision = crypto.randomUUID().replace(/-/g, '');
-    return { snapshot: { version: 1, revision: newRevision, ...content }, assets,
+    const snapshot = checkManifest({ version: content.pages?.length ? 2 : 1, revision: newRevision, ...content });
+    return { snapshot, assets,
       changed: contentKey(content) !== oldBaseline, baseRevision };
   }
   function remember(newRevision, content) {
@@ -589,15 +819,33 @@ window.slidePublishedDeck = (() => {
     return typeof value === 'string' && value.length > 0 && value.length <= 160;
   }
 
+  function checkedPages(snapshot) {
+    const pages = snapshot.pages === undefined ? [] : snapshot.pages;
+    if (!Array.isArray(pages) || snapshot.version !== (pages.length ? 2 : 1)) {
+      throw failure('invalid', '页面版本不兼容，请刷新后重试。');
+    }
+    const known = new Set(Array.from({ length: 25 }, (_, index) => String(index + 1)));
+    return pages.map(page => {
+      if (!isMap(page) || Object.keys(page).length !== 2 || typeof page.id !== 'string' ||
+          !/^u-[0-9a-f]{32}$/.test(page.id) || known.has(page.id) || !known.has(page.after)) {
+        throw failure('invalid', '新增页的位置或标识有误，请刷新后重试。');
+      }
+      known.add(page.id);
+      return { id: page.id, after: page.after };
+    });
+  }
+
   function serializeSnapshot(snapshot) {
-    if (!isMap(snapshot) || snapshot.version !== 1 || !isRevision(snapshot.revision) ||
+    if (!isMap(snapshot) || !isRevision(snapshot.revision) ||
         !isMap(snapshot.texts) || !isMap(snapshot.notes) || !Array.isArray(snapshot.images) ||
         !Object.values(snapshot.texts).every(value => typeof value === 'string') ||
         !Object.values(snapshot.notes).every(value => typeof value === 'string')) {
       throw failure('invalid', '修改内容不完整，请重新打开编辑工具。');
     }
+    const pages = checkedPages(snapshot);
     const content = JSON.stringify({
-      version: 1, revision: snapshot.revision, texts: snapshot.texts, notes: snapshot.notes, images: snapshot.images
+      version: snapshot.version, revision: snapshot.revision, texts: snapshot.texts, notes: snapshot.notes, images: snapshot.images,
+      ...(pages.length ? { pages } : {})
     });
     if (new Blob([content]).size > blobLimit) throw failure('invalid', '修改内容超出GitHub单文件上限。');
     return content;
@@ -673,9 +921,10 @@ window.slidePublishedDeck = (() => {
     const ref = await request(token, repository + '/git/ref/heads/main');
     const head = checkedSha(ref.object?.sha);
     const snapshot = await request(token, repository + '/contents/' + manifestPath + '?ref=' + head, { raw: true });
-    if (snapshot?.version !== 1 || !isRevision(snapshot.revision)) {
+    if (!isMap(snapshot) || !isRevision(snapshot.revision)) {
       throw failure('upload', '线上演示内容暂时无法读取，请稍后重试。');
     }
+    checkedPages(snapshot);
     return { head, snapshot };
   }
 
@@ -698,6 +947,12 @@ window.slidePublishedDeck = (() => {
       throw failure('conflict', conflictMessage);
     }
     if (baseline.snapshot.revision !== baseRevision) throw failure('conflict', conflictMessage);
+    // Existing pages keep their identity and anchors even when an older editor
+    // submits a v1 draft through the updated Windows helper.
+    const previousPages = baseline.snapshot.pages || [];
+    const nextPages = target.pages || [];
+    if (previousPages.some((page, index) => nextPages[index]?.id !== page.id ||
+        nextPages[index].after !== page.after)) throw failure('conflict', conflictMessage);
 
     const unique = new Map();
     for (const asset of assets) {
@@ -862,7 +1117,7 @@ window.mountSlidePublisher = function (options) {
         return;
       }
       const state = draft.snapshot;
-      const signature = JSON.stringify([draft.baseRevision, state.texts, state.notes, state.images]);
+      const signature = JSON.stringify([draft.baseRevision, state.pages, state.texts, state.notes, state.images]);
       // Reusing the target version makes retries safe after a lost confirmation.
       if (previousAttempt?.signature === signature) state.revision = previousAttempt.revision;
       else previousAttempt = { signature, revision: state.revision };
@@ -933,7 +1188,6 @@ window.createSlideImageEditor = function (options) {
   'use strict';
   const { canvas, slides, storeKey, getSlide, announce, onSelectionChange } = options;
   let scope = storeKey + '/' + (document.body.dataset.imageRevision || 'original');
-  const slideByPage = new Map(slides.map(slide => [slide.dataset.slide, slide]));
   const boxes = new Map();
   const embedded = new Set();
   const uncommitted = new Set();
@@ -1017,7 +1271,7 @@ window.createSlideImageEditor = function (options) {
         boxes.delete(item.id);
         continue;
       }
-      const slide = slideByPage.get(item.page);
+      const slide = slides.find(itemSlide => itemSlide.dataset.slide === item.page);
       if (!slide || ![item.x, item.y, item.w, item.h].every(Number.isFinite) || item.w <= 0 || item.h <= 0) continue;
       if (box) {
         place(box, item);
@@ -1141,7 +1395,7 @@ window.createSlideImageEditor = function (options) {
       select(box);
       box.focus({ preventScroll: true });
     }
-    announce('图片已插入第' + slide.dataset.slide + '页。拖动图片可移动，拖动四角可缩放。');
+    announce('图片已插入第' + (slides.indexOf(slide) + 1) + '页。拖动图片可移动，拖动四角可缩放。');
     persist(box);
   }
   function insert(file, slide = getSlide()) {
@@ -1241,7 +1495,6 @@ window.createSlideImageEditor = function (options) {
   const publication = await window.slidePublishedDeck.load();
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-  const slides = $$('[data-slide]');
   const pageInput = $('#page-input');
   const notePanel = $('#notes-panel');
   const noteBody = $('#notes-content');
@@ -1258,6 +1511,15 @@ window.createSlideImageEditor = function (options) {
     const el = $('#toast'); el.textContent = message; el.hidden = false;
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 2800);
   };
+  const pageManager = window.slidePages;
+  pageManager.restoreDraft(storeKey, announce);
+  const slides = $$('#canvas > [data-slide]');
+  const overviewList = $('.overview-list');
+  const overviewTemplate = $('button', overviewList).cloneNode(true);
+  const authoredChapters = new Map($$('button', overviewList)
+    .filter(row => /^\d+$/.test(row.dataset.overviewPage))
+    .map(row => [row.dataset.overviewPage, $('small', row).textContent]));
+  const chapterByPage = new Map();
   const insertImageButton = $('#insert-image-button');
   const imageFileInput = $('#image-file-input');
   const removeImageButton = $('#remove-image-button');
@@ -1274,6 +1536,7 @@ window.createSlideImageEditor = function (options) {
     afterCommit: snapshot => {
       window.slidePublishedDeck.markPublished(snapshot);
       storeKey = revisionStoreKey(snapshot.revision);
+      pageManager.markPublished(storeKey, snapshot.pages || []);
       imageEditor.markPublished(snapshot.revision, snapshot.images);
     }
   });
@@ -1287,14 +1550,54 @@ window.createSlideImageEditor = function (options) {
     $('#canvas').style.transform = `scale(${scale})`;
     $('#canvas').style.setProperty('--image-control-unit', (1 / scale) + 'px');
   }
-  function chapterFor(index) {
-    const entries = $$('.chapters button');
-    return entries.filter(b => Number(b.dataset.goto) <= index + 1).at(-1);
+  function indexForPage(pageKey) {
+    return slides.findIndex(slide => slide.dataset.slide === String(pageKey));
+  }
+  function rebuildPageList() {
+    slides.splice(0, slides.length, ...$$('#canvas > [data-slide]'));
+    pageManager.refreshTitles();
+    const rows = document.createDocumentFragment();
+    let chapter = '';
+    slides.forEach((slide, index) => {
+      const key = slide.dataset.slide;
+      chapter = authoredChapters.get(key) || chapter;
+      chapterByPage.set(key, chapter);
+      const row = overviewTemplate.cloneNode(true);
+      row.hidden = false;
+      row.dataset.overviewIndex = String(index);
+      row.dataset.overviewPage = key;
+      $('.index', row).textContent = String(index + 1).padStart(2, '0');
+      $('.overview-page-title', row).textContent = slide.dataset.title;
+      $('small', row).textContent = chapter;
+      slide.setAttribute('aria-label', `第${index + 1}页：${slide.dataset.title}`);
+      rows.append(row);
+    });
+    overviewList.replaceChildren(rows, $('#no-result', overviewList));
+    pageInput.max = String(slides.length);
+    $('.page-number > span:last-child').textContent = '/ ' + slides.length;
+    $('#overview-title small').textContent = slides.length + '页';
+    $('#progress').setAttribute('aria-valuemax', String(slides.length));
+  }
+  function updateLabels() {
+    const title = slides[current].dataset.title;
+    $('#current-title').textContent = title;
+    $('#notes-meta').textContent = `第${current + 1}页　${title}`;
+    $('#page-announcement').textContent = `第${current + 1}页，共${slides.length}页，${title}`;
+  }
+  function syncEditedTitle(field) {
+    if (!field?.hasAttribute('data-page-title')) return;
+    pageManager.refreshTitles();
+    const slide = field.closest('[data-slide]');
+    const index = indexForPage(slide.dataset.slide);
+    if (index < 0) return;
+    const row = $(`[data-overview-index="${index}"]`, overviewList);
+    $('.overview-page-title', row).textContent = slide.dataset.title;
+    slide.setAttribute('aria-label', `第${index + 1}页：${slide.dataset.title}`);
+    if (index === current) updateLabels();
   }
   function refreshNotes() {
-    const note = $('#note-' + (current + 1));
+    const note = document.getElementById('note-' + slides[current].dataset.slide);
     noteBody.textContent = note ? note.textContent : '这一页没有讲稿备注。';
-    $('#notes-meta').textContent = `第${current + 1}页　${slides[current].dataset.title}`;
     noteBody.contentEditable = editing ? 'true' : 'false';
     noteBody.setAttribute('aria-label', '本页讲稿');
   }
@@ -1309,7 +1612,7 @@ window.createSlideImageEditor = function (options) {
     });
     current = index;
     pageInput.value = current + 1;
-    $('#current-title').textContent = slides[current].dataset.title;
+    updateLabels();
     $('#prev-button').disabled = current === 0;
     $('#next-button').disabled = current === slides.length - 1;
     $('#quick-prev').disabled = current === 0;
@@ -1318,14 +1621,14 @@ window.createSlideImageEditor = function (options) {
     $('#quick-count').setAttribute('aria-label', `第${current + 1}页，共${slides.length}页；点击选择页面`);
     $('#progress-value').style.transform = `scaleX(${(current + 1) / slides.length})`;
     $('#progress').setAttribute('aria-valuenow', current + 1);
-    $$('.chapters button').forEach(b => b.classList.toggle('current', b === chapterFor(current)));
+    $$('.chapters button').forEach(b => b.classList.toggle('current', b.textContent === chapterByPage.get(slides[current].dataset.slide)));
     $$('[data-overview-index]').forEach(b => b.classList.toggle('current', Number(b.dataset.overviewIndex) === current));
     refreshNotes();
     if (updateHash) {
-      try { history.replaceState(null, '', '#slide=' + (current + 1)); } catch { location.hash = 'slide=' + (current + 1); }
-      safeStore.set(storeKey + '-page', String(current + 1));
+      const key = slides[current].dataset.slide;
+      try { history.replaceState(null, '', '#slide=' + key); } catch { location.hash = 'slide=' + key; }
+      safeStore.set(storeKey + '-page', key);
     }
-    $('#page-announcement').textContent = `第${current + 1}页，共${slides.length}页，${slides[current].dataset.title}`;
   }
   function showModal(id) {
     closeModal(); modalReturn = document.activeElement;
@@ -1355,13 +1658,16 @@ window.createSlideImageEditor = function (options) {
     refreshNotes();
     if (editing) announce('点击文字可修改，拖动新插入的图片可调整位置。');
   }
-  function saveEdits() {
-    const values = {};
-    $$('[data-editable]').forEach(el => {
-      const visible = el.closest('[data-slide]')?.getAttribute('aria-hidden') !== 'true';
-      values[el.dataset.editable] = (visible ? el.innerText : el.textContent).replace(/\r\n/g, '\n');
-    });
-    safeStore.set(storeKey + '-edits', JSON.stringify(values));
+  function saveField(group, id, value) {
+    const key = storeKey + '-' + group;
+    let fields = {};
+    try { fields = JSON.parse(safeStore.get(key) || '{}') || {}; } catch {}
+    fields[id] = value;
+    safeStore.set(key, JSON.stringify(fields));
+  }
+  function saveEdits(el) {
+    const visible = el.closest('[data-slide]')?.getAttribute('aria-hidden') !== 'true';
+    saveField('edits', el.dataset.editable, (visible ? el.innerText : el.textContent).replace(/\r\n/g, '\n'));
   }
   async function saveHTML() {
     const saveButton = $('#save-button');
@@ -1377,7 +1683,7 @@ window.createSlideImageEditor = function (options) {
     $('#publish-dialog', clone)?.remove();
     $('#publish-button', clone)?.remove();
     body.classList.remove('edit-mode', 'presentation-mode', 'show-hint', 'workbench-open');
-    body.dataset.start = String(current + 1);
+    body.dataset.start = slides[current].dataset.slide;
     $$('[data-editable]', clone).forEach(el => {
       const original = document.querySelector('[data-editable="' + el.dataset.editable + '"]');
       const visible = original.closest('[data-slide]')?.getAttribute('aria-hidden') !== 'true';
@@ -1427,11 +1733,10 @@ window.createSlideImageEditor = function (options) {
     } finally { saveButton.disabled = false; }
   }
   function saveNote() {
-    const target = $('#note-' + (current + 1));
-    if (target) target.textContent = noteBody.innerText.replace(/\r\n/g, '\n');
-    const values = {};
-    $$('.note-source').forEach(note => { values[note.id] = note.textContent; });
-    safeStore.set(storeKey + '-notes', JSON.stringify(values));
+    const target = document.getElementById('note-' + slides[current].dataset.slide);
+    if (!target) return;
+    target.textContent = noteBody.innerText.replace(/\r\n/g, '\n');
+    saveField('notes', target.id, target.textContent);
   }
   function hint() {
     if (!presenting) return;
@@ -1505,6 +1810,15 @@ window.createSlideImageEditor = function (options) {
   $('#close-notes').addEventListener('click', toggleNotes);
   $('#fullscreen-button').addEventListener('click', togglePresent);
   $('#edit-button').addEventListener('click', toggleEdit);
+  $('#add-page-button').addEventListener('click', () => {
+    try {
+      if (!editing) toggleEdit();
+      const page = pageManager.insertAfter(slides[current]);
+      rebuildPageList();
+      go(slides.indexOf(page));
+      $('[data-page-title]', page).focus({ preventScroll: true });
+    } catch (error) { announce(error.message || '页面未能新增，请重试。'); }
+  });
   let imageTarget;
   insertImageButton.addEventListener('click', () => {
     imageTarget = slides[current];
@@ -1524,11 +1838,13 @@ window.createSlideImageEditor = function (options) {
   removeImageButton.addEventListener('click', () => imageEditor.removeSelected());
   $('#save-button').addEventListener('click', saveHTML);
   $('#help-button').addEventListener('click', () => showModal('help-modal'));
-  pageInput.max = slides.length;
   pageInput.addEventListener('change', () => go(Number(pageInput.value) - 1));
   pageInput.addEventListener('keydown', event => { if (event.key === 'Enter') { go(Number(pageInput.value) - 1); pageInput.blur(); } });
-  $$('[data-goto]').forEach(b => b.addEventListener('click', () => go(Number(b.dataset.goto) - 1)));
-  $$('[data-overview-index]').forEach(b => b.addEventListener('click', () => { closeModal(); go(Number(b.dataset.overviewIndex)); }));
+  $$('[data-goto]').forEach(b => b.addEventListener('click', () => go(indexForPage(b.dataset.goto))));
+  overviewList.addEventListener('click', event => {
+    const row = event.target.closest('[data-overview-index]');
+    if (row) { closeModal(); go(Number(row.dataset.overviewIndex)); }
+  });
   $$('[data-close]').forEach(b => b.addEventListener('click', closeModal));
   $$('.modal').forEach(el => el.addEventListener('click', event => { if (event.target === el) closeModal(); }));
   function filterOverview(value) {
@@ -1564,14 +1880,16 @@ window.createSlideImageEditor = function (options) {
     imageDrag = null; $('#zoom-viewport').classList.remove('dragging');
   }));
   document.addEventListener('input', event => {
-    if (event.target.closest('[data-editable]')) saveEdits();
+    const field = event.target.closest('[data-editable]');
+    if (field) { saveEdits(field); syncEditedTitle(field); }
     if (event.target === noteBody) saveNote();
   });
   document.addEventListener('focusout', event => {
     const el = event.target.closest('[data-editable]');
     if (el && editing) {
       el.textContent = el.innerText.replace(/\r\n/g, '\n');
-      saveEdits();
+      saveEdits(el);
+      syncEditedTitle(el);
     }
   });
   document.addEventListener('click', event => {
@@ -1640,7 +1958,11 @@ window.createSlideImageEditor = function (options) {
   });
   document.addEventListener('mousemove', hint, { passive: true });
   window.addEventListener('resize', () => { fit(); paintImage(); });
-  window.addEventListener('hashchange', () => { const n = Number(location.hash.match(/slide=(\d+)/)?.[1]); if (n) go(n - 1, false); });
+  const hashPage = () => new URLSearchParams(location.hash.slice(1)).get('slide');
+  window.addEventListener('hashchange', () => {
+    const index = indexForPage(hashPage());
+    if (index >= 0) go(index, false);
+  });
   new ResizeObserver(fit).observe($('#stage-area'));
   // Restore only text edits made in this file on this device; every exported file already contains them.
   try {
@@ -1649,8 +1971,9 @@ window.createSlideImageEditor = function (options) {
     const notes = JSON.parse(safeStore.get(storeKey + '-notes') || '{}');
     $$('.note-source').forEach(el => { if (Object.hasOwn(notes, el.id)) el.textContent = notes[el.id]; });
   } catch {}
-  const initial = Number(location.hash.match(/slide=(\d+)/)?.[1] || document.body.dataset.start || safeStore.get(storeKey + '-page') || 1);
-  go(initial - 1, false); fit();
+  rebuildPageList();
+  const initial = hashPage() || document.body.dataset.start || safeStore.get(storeKey + '-page') || '1';
+  go(Math.max(0, indexForPage(initial)), false); fit();
   if (publication.error) announce('暂时无法读取已发布版本，请刷新页面重试。');
   document.fonts.ready.then(fit);
   window.deck = { go: number => go(number - 1), get current() { return current + 1; }, get total() { return slides.length; } };

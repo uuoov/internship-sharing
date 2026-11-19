@@ -213,6 +213,25 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   color: #8c837c;
   pointer-events: none;
 }
+@media (min-width: 701px) and (max-width: 960px) {
+  .workbench-open .header-actions { gap: 2px; }
+  .workbench-open .header-actions button { padding-inline: 7px; white-space: nowrap; }
+  .workbench-open .brand small { display: none; }
+}
+@media (min-width: 701px) and (max-width: 900px) {
+  .workbench-open .masthead { padding-inline: 12px; gap: 10px; }
+  .workbench-open #edit-button span, .workbench-open #save-button span,
+  .workbench-open #back-to-show-button span, .workbench-open #remove-image-button span { display: none; }
+}
+@media (max-width: 500px) {
+  .workbench-open .masthead .brand { display: none; }
+  .workbench-open .masthead .header-actions { width: 100%; justify-content: space-between; }
+  .workbench-open #delete-page-button span { display: inline; white-space: nowrap; }
+  .workbench-open #delete-page-button svg { display: none; }
+}
+@media (max-width: 360px) {
+  .workbench-open .masthead .header-actions button { padding-inline: 5px; }
+}
 </style>
 </head>
 <body data-source="6e0b0f4eeca56c3887367021a8eefe7f65a0aba2c4432d3872bd2bcac9d003c7" data-start="1">
@@ -224,6 +243,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   <div class="header-actions">
     <button id="edit-button" aria-pressed="false" title="编辑页面（E）" aria-label="编辑页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"/></svg><span id="edit-label">编辑页面</span></button>
     <button id="add-page-button" title="在当前页后新增页面" aria-label="新增页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 12h8m-4-4v8"/></svg><span>新增页面</span></button>
+    <button id="delete-page-button" title="删除当前页面" aria-label="删除页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 12h8"/></svg><span>删除页面</span></button>
     <button id="insert-image-button" title="在当前页插入图片" aria-label="插入图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 3 3 4-4 5 5"/></svg><span>插入图片</span></button>
     <input id="image-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="选择要插入的图片" hidden>
     <button id="remove-image-button" title="删除选中图片（Delete）" aria-label="删除选中图片" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>删除图片</span></button>
@@ -379,11 +399,14 @@ window.slidePages = (() => {
   'use strict';
   const canvas = document.getElementById('canvas');
   const sections = new Map(Array.from(canvas.children).filter(el => el.hasAttribute('data-slide')).map(el => [el.dataset.slide, el]));
-  const originalIds = Array.from(sections.keys()).filter(id => /^[1-9]\d*$/.test(id));
+  // An offline export already contains its final visible order, including custom pages.
+  const originalIds = Array.from(sections.keys());
+  window.authoredSlideIds = Object.freeze(originalIds.slice());
   const customId = /^u-[0-9a-f]{32}$/;
   const fallbackTitle = '未命名页面';
   const notes = document.querySelector('.note-source').parentElement;
-  let records = [], prefix = '', announce = () => {}, clock = 0;
+  let records = [], deleted = new Set(), prefix = '', deletePrefix = '', announce = () => {}, clock = 0;
+  let fullOrder = originalIds.slice();
 
   function validatePages(value) {
     if (!Array.isArray(value)) throw new Error('新增页面列表无效。');
@@ -424,18 +447,25 @@ window.slidePages = (() => {
     return page;
   }
   function refreshTitles() {
-    for (const { id } of records) {
-      const page = sections.get(id);
+    for (const [id, page] of sections) {
+      if (!customId.test(id) || !page.isConnected) continue;
       const title = page.querySelector('[data-page-title]').textContent.trim() || fallbackTitle;
       page.dataset.title = title;
       page.setAttribute('aria-label', title);
     }
   }
-  function applyPages(value) {
+  function validateDeleted(ids, pages) {
+    const known = new Set([...originalIds, ...pages.map(page => page.id)]);
+    if (!Array.isArray(ids) || ids.length >= known.size || new Set(ids).size !== ids.length ||
+        ids.some(id => !known.has(id))) throw new Error('删除页面列表无效，至少要保留一页。');
+    return ids.slice();
+  }
+  function applyPages(value, deletedIds = []) {
     const ordered = validatePages(value);
-    const desired = new Set(ordered.map(page => page.id));
+    deleted = new Set(validateDeleted(deletedIds, ordered));
+    const desired = new Set([...originalIds, ...ordered.map(page => page.id)]);
     for (const [id, page] of sections) {
-      if (customId.test(id) && !desired.has(id)) {
+      if (!desired.has(id) || deleted.has(id)) {
         document.getElementById('note-' + id)?.remove();
         page.remove();
         sections.delete(id);
@@ -445,27 +475,35 @@ window.slidePages = (() => {
     // preserving authored videos, existing editable elements and image objects.
     const next = new Map(originalIds.map((id, index) => [id, originalIds[index + 1]]));
     ordered.forEach((item, index) => {
-      const page = sections.get(item.id) || createPage(item);
-      page.dataset.pageAfter = item.after;
-      page.dataset.pageSequence = String(index);
+      if (!deleted.has(item.id)) {
+        const page = sections.get(item.id) || createPage(item);
+        page.dataset.pageAfter = item.after;
+        page.dataset.pageSequence = String(index);
+      }
       next.set(item.id, next.get(item.after));
       next.set(item.after, item.id);
     });
     let previous;
+    fullOrder = [];
     for (let id = originalIds[0]; id !== undefined; id = next.get(id)) {
+      fullOrder.push(id);
+      if (deleted.has(id)) continue;
       const page = sections.get(id);
-      if (customId.test(id) && previous.nextElementSibling !== page) previous.after(page);
+      if (!previous && canvas.firstElementChild !== page) canvas.prepend(page);
+      else if (previous && previous.nextElementSibling !== page) previous.after(page);
       previous = page;
     }
     records = ordered;
     refreshTitles();
   }
-  const embedded = Array.from(sections.values()).filter(page => customId.test(page.dataset.slide))
-    .sort((a, b) => Number(a.dataset.pageSequence) - Number(b.dataset.pageSequence));
-  applyPages(embedded.map(page => ({ id: page.dataset.slide, after: page.dataset.pageAfter })));
-
   function readPages() {
     return records.map(({ id, after }) => ({ id, after }));
+  }
+  function resolvePage(id) {
+    if (!deleted.has(id)) return id;
+    const index = fullOrder.indexOf(id);
+    return fullOrder.slice(index + 1).find(key => !deleted.has(key)) ||
+      fullOrder.slice(0, index).reverse().find(key => !deleted.has(key));
   }
   function draftPrefix(storeKey) {
     return storeKey + '-slide-insert/';
@@ -485,23 +523,26 @@ window.slidePages = (() => {
   }
   function restoreDraft(storeKey, report) {
     prefix = draftPrefix(storeKey);
+    deletePrefix = storeKey + '-slide-delete/';
     if (report) announce = report;
     const additions = [];
+    const removals = [];
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
+        if (key?.startsWith(deletePrefix)) { removals.push(key.slice(deletePrefix.length)); continue; }
         if (!key?.startsWith(prefix)) continue;
         const item = JSON.parse(localStorage.getItem(key));
         if (!item || !customId.test(item.id) || key !== prefix + item.id || !Number.isSafeInteger(item.time) ||
             typeof item.after !== 'string') throw new Error();
         clock = Math.max(clock, item.time);
-        if (!sections.has(item.id)) additions.push(item);
+        if (!records.some(record => record.id === item.id) && !originalIds.includes(item.id)) additions.push(item);
       }
     } catch {
       announce('浏览器未能完整读取新增页面草稿。');
     }
     additions.sort((a, b) => a.time - b.time || a.id.localeCompare(b.id));
-    const known = new Set(sections.keys()), restored = readPages();
+    const restored = readPages(), known = new Set([...originalIds, ...restored.map(page => page.id)]);
     // Tabs write a separate immutable record for each page. Resolve dependencies
     // even if two tabs used the same timestamp or their system clocks differed.
     let pending = additions;
@@ -515,23 +556,40 @@ window.slidePages = (() => {
       if (later.length === pending.length) { announce('部分页面草稿的插入位置已不存在。'); break; }
       pending = later;
     }
-    applyPages(restored);
+    const combined = new Set(deleted);
+    for (const id of removals.sort()) {
+      if (combined.size < known.size - 1 && known.has(id)) combined.add(id);
+    }
+    applyPages(restored, [...combined]);
   }
   function insertAfter(slide) {
     if (!prefix || sections.get(slide?.dataset.slide) !== slide) throw new Error('请选择要插入新页的位置。');
     const record = { id: 'u-' + crypto.randomUUID().replace(/-/g, ''), after: slide.dataset.slide };
-    applyPages([...records, record]);
+    applyPages([...records, record], [...deleted]);
     saveOperation(record);
     return sections.get(record.id);
   }
-  function markPublished(storeKey, pages) {
+  function saveDeletion(id) {
+    try { localStorage.setItem(deletePrefix + id, '1'); }
+    catch { announce('浏览器未能保存删页草稿。请点“保存HTML”保留当前版本。'); }
+  }
+  function removePage(slide) {
+    const id = slide?.dataset.slide;
+    if (!deletePrefix || sections.get(id) !== slide) throw new Error('请选择要删除的页面。');
+    applyPages(records, [...deleted, id]);
+    saveDeletion(id);
+  }
+  function markPublished(storeKey, pages, deletedIds) {
     const committed = new Set(validatePages(pages).map(page => page.id));
     prefix = draftPrefix(storeKey);
+    deletePrefix = storeKey + '-slide-delete/';
     // A pending insert made after the captured snapshot stays a draft in the new revision.
     // Earlier scopes are retained for other tabs still editing that public version.
     for (const record of records) if (!committed.has(record.id)) saveOperation(record);
+    for (const id of deleted) if (!deletedIds.includes(id)) saveDeletion(id);
   }
-  return { readPages, applyPages, validatePages, restoreDraft, insertAfter, refreshTitles, markPublished };
+  return { readPages, readDeleted: () => [...deleted], applyPages, validatePages, validateDeleted, restoreDraft,
+    insertAfter, removePage, resolvePage, refreshTitles, markPublished };
 })();
 
 // Public slide content is data only. The authored layout and scripts remain in the presentation.
@@ -594,13 +652,22 @@ window.slidePublishedDeck = (() => {
       y: Math.max(0, Math.min(bh - height, hundredths(y))), w: width, h: height, name, path };
   }
   function checkManifest(input) {
-    requireValue(dictionary(input) && (input.version === 1 || input.version === 2));
+    requireValue(dictionary(input) && [1, 2, 3].includes(input.version));
     requireValue(typeof input.revision === 'string' && (input.revision === initial || /^[0-9a-f]{32}$/.test(input.revision)));
     const pages = window.slidePages.validatePages(input.pages === undefined ? [] : input.pages);
-    requireValue(input.version === (pages.length ? 2 : 1));
+    const deletedPages = window.slidePages.validateDeleted(input.deletedPages === undefined ? [] : input.deletedPages, pages);
+    requireValue(input.version === (deletedPages.length ? 3 : pages.length ? 2 : 1));
+    const removed = new Set(deletedPages);
     const textKeys = new Set(authored.texts.keys()), noteKeys = new Set(authored.notes.keys());
     const pageIds = new Set(authored.slides.keys());
+    for (const id of deletedPages) {
+      const key = pageKey(id);
+      for (const el of authored.slides.get(key)?.querySelectorAll('[data-editable]') || []) textKeys.delete(el.dataset.editable);
+      noteKeys.delete('note-' + id);
+      pageIds.delete(key);
+    }
     for (const { id } of pages) {
+      if (removed.has(id)) continue;
       textKeys.add(id + '-title');
       textKeys.add(id + '-body');
       noteKeys.add('note-' + id);
@@ -610,8 +677,9 @@ window.slidePublishedDeck = (() => {
     requireValue(Array.isArray(input.images));
     const images = input.images.map(image => checkImage(image, pageIds));
     requireValue(new Set(images.map(image => image.id)).size === images.length);
-    if (input.revision === initial) requireValue(!pages.length && !images.length && !Object.keys(texts).length && !Object.keys(notes).length);
-    return { version: input.version, revision: input.revision, texts, notes, images, ...(pages.length ? { pages } : {}) };
+    if (input.revision === initial) requireValue(!deletedPages.length && !pages.length && !images.length && !Object.keys(texts).length && !Object.keys(notes).length);
+    return { version: input.version, revision: input.revision, texts, notes, images, ...(pages.length ? { pages } : {}),
+      ...(deletedPages.length ? { deletedPages } : {}) };
   }
   function attachImage(image, slides) {
     const box = document.createElement('div'), img = document.createElement('img');
@@ -630,8 +698,8 @@ window.slidePublishedDeck = (() => {
   function apply(manifest) {
     // An empty first publication represents the original slides. Keep the draft
     // namespace so work started before this feature remains available.
-    if (!manifest.pages?.length && !Object.keys(manifest.texts).length && !Object.keys(manifest.notes).length && !manifest.images.length) return;
-    window.slidePages.applyPages(manifest.pages || []);
+    if (!manifest.pages?.length && !manifest.deletedPages?.length && !Object.keys(manifest.texts).length && !Object.keys(manifest.notes).length && !manifest.images.length) return;
+    window.slidePages.applyPages(manifest.pages || [], manifest.deletedPages || []);
     const nodes = liveNodes();
     for (const [id, value] of Object.entries(manifest.texts)) nodes.texts.get(id).textContent = value;
     for (const [id, value] of Object.entries(manifest.notes)) nodes.notes.get(id).textContent = value;
@@ -661,6 +729,7 @@ window.slidePublishedDeck = (() => {
   async function capture() {
     const nodes = liveNodes();
     const pages = window.slidePages.readPages();
+    const deletedPages = window.slidePages.readDeleted();
     const texts = readText(nodes.texts, true), notes = readText(nodes.notes, false);
     const existingPaths = publishedPaths;
     // Freeze the full click-time snapshot before the first asynchronous image digest.
@@ -682,11 +751,11 @@ window.slidePublishedDeck = (() => {
       images.push(checkImage(record, nodes.slides));
     }
     requireValue(new Set(images.map(image => image.id)).size === images.length, '有重复的图片标识，请重新插入重复的图片。');
-    return { content: { texts, notes, images, ...(pages.length ? { pages } : {}) }, assets: Array.from(assets.values()) };
+    return { content: { texts, notes, images, ...(pages.length ? { pages } : {}), ...(deletedPages.length ? { deletedPages } : {}) }, assets: Array.from(assets.values()) };
   }
-  function contentKey({ texts, notes, images, pages = [] }) {
+  function contentKey({ texts, notes, images, pages = [], deletedPages = [] }) {
     const pairs = values => Object.keys(values).sort().map(key => [key, values[key]]);
-    return JSON.stringify([pages, pairs(texts), pairs(notes), images]);
+    return JSON.stringify([pages, deletedPages.slice().sort(), pairs(texts), pairs(notes), images]);
   }
   async function loadPublic() {
     const allowed = ['sharing.internship.liangzhicong.com', 'localhost', '127.0.0.1', '[::1]'];
@@ -721,7 +790,7 @@ window.slidePublishedDeck = (() => {
     const baseRevision = revision, oldBaseline = baseline;
     const { content, assets } = await capture();
     const newRevision = crypto.randomUUID().replace(/-/g, '');
-    const snapshot = checkManifest({ version: content.pages?.length ? 2 : 1, revision: newRevision, ...content });
+    const snapshot = checkManifest({ version: content.deletedPages?.length ? 3 : content.pages?.length ? 2 : 1, revision: newRevision, ...content });
     return { snapshot, assets,
       changed: contentKey(content) !== oldBaseline, baseRevision };
   }
@@ -779,21 +848,27 @@ window.slidePublishedDeck = (() => {
 
   function checkedPages(snapshot) {
     const pages = snapshot.pages === undefined ? [] : snapshot.pages;
-    if (!Array.isArray(pages) || snapshot.version !== (pages.length ? 2 : 1)) {
+    const deleted = snapshot.deletedPages === undefined ? [] : snapshot.deletedPages;
+    if (!Array.isArray(pages) || !Array.isArray(deleted) ||
+        snapshot.version !== (deleted.length ? 3 : pages.length ? 2 : 1)) {
       throw failure('invalid', '页面版本不兼容，请刷新后重试。');
     }
     const originalIds = window.authoredSlideIds || Array.from(
       document.querySelectorAll('#canvas > [data-slide]'), slide => slide.dataset.slide
     ).filter(id => /^\d+$/.test(id));
     const known = new Set(originalIds);
-    return pages.map(page => {
+    for (const page of pages) {
       if (!isMap(page) || Object.keys(page).length !== 2 || typeof page.id !== 'string' ||
           !/^u-[0-9a-f]{32}$/.test(page.id) || known.has(page.id) || !known.has(page.after)) {
         throw failure('invalid', '新增页的位置或标识有误，请刷新后重试。');
       }
       known.add(page.id);
-      return { id: page.id, after: page.after };
-    });
+    }
+    const deletedIds = new Set(deleted);
+    if (deletedIds.size !== deleted.length || deletedIds.size >= known.size || deleted.some(id => !known.has(id))) {
+      throw failure('invalid', '删除的页面有误，或演示中没有剩余页面。');
+    }
+    return { ...(pages.length ? { pages } : {}), ...(deleted.length ? { deletedPages: deleted } : {}) };
   }
 
   function serializeSnapshot(snapshot) {
@@ -803,10 +878,10 @@ window.slidePublishedDeck = (() => {
         !Object.values(snapshot.notes).every(value => typeof value === 'string')) {
       throw failure('invalid', '修改内容不完整，请重新打开编辑工具。');
     }
-    const pages = checkedPages(snapshot);
+    const pageState = checkedPages(snapshot);
     const content = JSON.stringify({
       version: snapshot.version, revision: snapshot.revision, texts: snapshot.texts, notes: snapshot.notes, images: snapshot.images,
-      ...(pages.length ? { pages } : {})
+      ...pageState
     });
     if (new Blob([content]).size > blobLimit) throw failure('invalid', '修改内容超出GitHub单文件上限。');
     return content;
@@ -914,6 +989,8 @@ window.slidePublishedDeck = (() => {
     const nextPages = target.pages || [];
     if (previousPages.some((page, index) => nextPages[index]?.id !== page.id ||
         nextPages[index].after !== page.after)) throw failure('conflict', conflictMessage);
+    const nextDeleted = new Set(target.deletedPages || []);
+    if ((baseline.snapshot.deletedPages || []).some(id => !nextDeleted.has(id))) throw failure('conflict', conflictMessage);
 
     const unique = new Map();
     for (const asset of assets) {
@@ -1078,7 +1155,7 @@ window.mountSlidePublisher = function (options) {
         return;
       }
       const state = draft.snapshot;
-      const signature = JSON.stringify([draft.baseRevision, state.pages, state.texts, state.notes, state.images]);
+      const signature = JSON.stringify([draft.baseRevision, state.pages, state.deletedPages, state.texts, state.notes, state.images]);
       // Reusing the target version makes retries safe after a lost confirmation.
       if (previousAttempt?.signature === signature) state.revision = previousAttempt.revision;
       else previousAttempt = { signature, revision: state.revision };
@@ -1344,6 +1421,7 @@ window.createSlideImageEditor = function (options) {
   async function add(file, slide) {
     await ready;
     const picture = await readPicture(file);
+    if (!slides.includes(slide)) return;
     const ratio = picture.width / picture.height;
     const boardW = slide.clientWidth, boardH = slide.clientHeight;
     const w = Math.min(Math.max(picture.width, Math.min(120, 120 * ratio)), boardW * 0.5, boardH * 0.58 * ratio);
@@ -1478,7 +1556,6 @@ window.createSlideImageEditor = function (options) {
   const overviewList = $('.overview-list');
   const overviewTemplate = $('button', overviewList).cloneNode(true);
   const authoredChapters = new Map($$('button', overviewList)
-    .filter(row => /^\d+$/.test(row.dataset.overviewPage))
     .map(row => [row.dataset.overviewPage, $('small', row).textContent]));
   const chapterByPage = new Map();
   const insertImageButton = $('#insert-image-button');
@@ -1497,7 +1574,7 @@ window.createSlideImageEditor = function (options) {
     afterCommit: snapshot => {
       window.slidePublishedDeck.markPublished(snapshot);
       storeKey = revisionStoreKey(snapshot.revision);
-      pageManager.markPublished(storeKey, snapshot.pages || []);
+      pageManager.markPublished(storeKey, snapshot.pages || [], snapshot.deletedPages || []);
       imageEditor.markPublished(snapshot.revision, snapshot.images);
     }
   });
@@ -1518,11 +1595,11 @@ window.createSlideImageEditor = function (options) {
     slides.splice(0, slides.length, ...$$('#canvas > [data-slide]'));
     pageManager.refreshTitles();
     const rows = document.createDocumentFragment();
-    let chapter = '';
+    for (const [id, chapter] of authoredChapters) chapterByPage.set(id, chapter);
+    for (const { id, after } of pageManager.readPages()) chapterByPage.set(id, chapterByPage.get(after));
     slides.forEach((slide, index) => {
       const key = slide.dataset.slide;
-      chapter = authoredChapters.get(key) || chapter;
-      chapterByPage.set(key, chapter);
+      const chapter = chapterByPage.get(key) || '';
       const row = overviewTemplate.cloneNode(true);
       row.hidden = false;
       row.dataset.overviewIndex = String(index);
@@ -1538,6 +1615,12 @@ window.createSlideImageEditor = function (options) {
     $('.page-number > span:last-child').textContent = '/ ' + slides.length;
     $('#overview-title small').textContent = slides.length + '页';
     $('#progress').setAttribute('aria-valuemax', String(slides.length));
+    $('#delete-page-button').disabled = slides.length === 1;
+    $$('.chapters [data-goto]').forEach(button => {
+      const target = slides.find(page => chapterByPage.get(page.dataset.slide) === button.textContent);
+      button.hidden = !target;
+      if (target) button.dataset.goto = target.dataset.slide;
+    });
   }
   function updateLabels() {
     const title = slides[current].dataset.title;
@@ -1780,6 +1863,17 @@ window.createSlideImageEditor = function (options) {
       $('[data-page-title]', page).focus({ preventScroll: true });
     } catch (error) { announce(error.message || '页面未能新增，请重试。'); }
   });
+  $('#delete-page-button').addEventListener('click', () => {
+    const slide = slides[current];
+    if (slides.length < 2 || !window.confirm(`删除第${current + 1}页「${slide.dataset.title}」？`)) return;
+    try {
+      imageEditor.clearSelection();
+      $$('video', slide).forEach(video => video.pause());
+      pageManager.removePage(slide);
+      rebuildPageList();
+      go(current);
+    } catch (error) { announce(error.message || '页面未能删除，请重试。'); }
+  });
   let imageTarget;
   insertImageButton.addEventListener('click', () => {
     imageTarget = slides[current];
@@ -1921,8 +2015,9 @@ window.createSlideImageEditor = function (options) {
   window.addEventListener('resize', () => { fit(); paintImage(); });
   const hashPage = () => new URLSearchParams(location.hash.slice(1)).get('slide');
   window.addEventListener('hashchange', () => {
-    const index = indexForPage(hashPage());
-    if (index >= 0) go(index, false);
+    const id = hashPage(), resolved = pageManager.resolvePage(id);
+    const index = indexForPage(resolved);
+    if (index >= 0) go(index, resolved !== id);
   });
   new ResizeObserver(fit).observe($('#stage-area'));
   // Restore only text edits made in this file on this device; every exported file already contains them.
@@ -1934,7 +2029,8 @@ window.createSlideImageEditor = function (options) {
   } catch {}
   rebuildPageList();
   const initial = hashPage() || document.body.dataset.start || safeStore.get(storeKey + '-page') || '1';
-  go(Math.max(0, indexForPage(initial)), false); fit();
+  const resolved = pageManager.resolvePage(initial);
+  go(Math.max(0, indexForPage(resolved)), resolved !== initial); fit();
   if (publication.error) announce('暂时无法读取已发布版本，请刷新页面重试。');
   document.fonts.ready.then(fit);
   window.deck = { go: number => go(number - 1), get current() { return current + 1; }, get total() { return slides.length; } };

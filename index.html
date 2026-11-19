@@ -146,16 +146,13 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 #publish-close { display: grid; place-items: center; width: 36px; height: 36px; color: #453b35; }
 #publish-close:hover { background: #ece5de; }
 #publish-status { margin: 14px 0 4px; line-height: 1.6; }
-#publish-dialog details { margin: 16px 0; font-size: 14px; }
-#publish-dialog summary, #publish-dialog a { cursor: pointer; color: #893b26; }
-#publish-dialog ol { padding-left: 22px; line-height: 1.6; }
-#publish-dialog li + li { margin-top: 6px; }
+#publish-fallback { margin-top: 12px; color: #893b26; padding: 6px 0; }
+#publish-fallback:hover { text-decoration: underline; background: transparent; }
 #publish-form label { display: block; font-size: 14px; }
 #publish-token {
   display: block; width: 100%; margin: 6px 0; padding: 9px 11px; border: 1px solid #b5a79e;
   background: white; color: #282420; border-radius: 7px; font-size: 16px; color-scheme: light;
 }
-.publish-hint { color: #665d56; font-size: 13px; margin: 6px 0 10px; }
 #publish-remember-label { cursor: pointer; }
 #publish-remember { vertical-align: middle; margin: 0 5px 0 0; }
 #publish-submit { display: block; margin: 18px 0 0 auto; padding: 8px 16px; }
@@ -206,17 +203,12 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 <dialog id="publish-dialog" aria-labelledby="publish-heading">
   <header><h2 id="publish-heading">发布到原分享链接</h2><button id="publish-close" type="button" aria-label="关闭发布窗口"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
   <p id="publish-status" role="status" aria-live="polite"></p>
-  <form id="publish-form" autocomplete="off">
-    <details id="publish-instructions"><summary>如何取得发布授权</summary>
-      <ol><li>用网站所有者账号<strong>uuoov</strong>登录GitHub，<a href="https://github.com/settings/personal-access-tokens/new?name=Internship+slides&amp;target_name=uuoov&amp;contents=write&amp;expires_in=90" target="_blank" rel="noopener noreferrer">创建专用令牌</a>。</li>
-      <li>在Repository access选择“Only select repositories”，勾选<strong>internship-sharing</strong>。</li>
-      <li>确认Contents为“Read and write”，点“Generate token”，复制令牌并粘贴到下方。</li></ol>
-    </details>
-    <label for="publish-token">GitHub发布令牌</label>
+  <button id="publish-fallback" type="button" hidden>使用其他发布方式</button>
+  <form id="publish-form" autocomplete="off" hidden>
+    <label for="publish-token">发布凭据</label>
     <input id="publish-token" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required>
-    <p class="publish-hint">默认仅在当前标签页使用授权。</p>
     <label id="publish-remember-label" hidden><input id="publish-remember" type="checkbox">用此设备的密码管理器记住授权</label>
-    <button id="publish-submit" type="submit">授权并发布</button>
+    <button id="publish-submit" type="submit">发布</button>
   </form>
 </dialog>
 <div hidden><div class="note-source" id="note-1" hidden></div><div class="note-source" id="note-2" hidden></div><div class="note-source" id="note-3" hidden>今天从这五个问题聊起（0:30—1:00）
@@ -760,8 +752,9 @@ window.mountSlidePublisher = function (options) {
   const { publication, beforeSnapshot, afterCommit } = options;
   const button = document.getElementById('publish-button');
   const dialog = document.getElementById('publish-dialog');
-  if (!button || !dialog || (!publication.ready && !publication.error)) return;
+  if (!button || !dialog || window.top !== window.self || (!publication.ready && !publication.error)) return;
   const form = document.getElementById('publish-form');
+  const fallback = document.getElementById('publish-fallback');
   const input = document.getElementById('publish-token');
   const remember = document.getElementById('publish-remember');
   const status = document.getElementById('publish-status');
@@ -797,6 +790,28 @@ window.mountSlidePublisher = function (options) {
       optInToVault(true);
     } catch {}
   }
+  async function localRequest(path, data, nonce) {
+    const headers = { 'Content-Type': 'application/json', 'X-Slide-Publisher': '1' };
+    if (nonce) headers['X-Slide-Nonce'] = nonce;
+    let response, result;
+    try {
+      response = await fetch('http://127.0.0.1:18793/' + path, {
+        method: 'POST', headers, body: JSON.stringify(data), credentials: 'omit',
+        referrerPolicy: 'no-referrer', redirect: 'error', cache: 'no-store',
+        targetAddressSpace: 'loopback', signal: AbortSignal.timeout(path === 'status' ? 30000 : 240000)
+      });
+      result = await response.json();
+    } catch {
+      const message = path === 'status' ? '未连接到本机发布服务。' : '未收到发布结果，请重新点“发布”核对。';
+      throw Object.assign(new Error(message), { code: path === 'status' ? 'unavailable' : 'network' });
+    }
+    if (!response.ok) {
+      throw Object.assign(new Error(result.message || '本机发布服务暂时不可用。'), {
+        code: path === 'status' ? 'unavailable' : result.code
+      });
+    }
+    return result;
+  }
   async function checkLive(revision) {
     const attempt = ++monitor;
     const deadline = Date.now() + 180000;
@@ -807,7 +822,7 @@ window.mountSlidePublisher = function (options) {
         const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(8000) });
         if (response.ok && (await response.json()).revision === revision && attempt === monitor) {
           pendingRevision = '';
-          setStatus('新版已上线。别人打开原分享链接就能看到这次修改。');
+          setStatus('新版已上线。');
           return;
         }
       } catch {}
@@ -826,9 +841,19 @@ window.mountSlidePublisher = function (options) {
     writing = true;
     close.disabled = true;
     form.hidden = true;
+    fallback.hidden = true;
     input.value = '';
-    setStatus('正在整理本次修改…');
     try {
+      let nonce;
+      if (!secret) {
+        setStatus('正在连接本机…');
+        const local = await localRequest('status', {});
+        if (!local.ready || !/^[\w-]{43}$/.test(local.nonce || '')) {
+          throw Object.assign(new Error('本机发布服务未就绪。'), { code: 'unavailable' });
+        }
+        nonce = local.nonce;
+      }
+      setStatus('正在整理本次修改…');
       await beforeSnapshot();
       const draft = await window.slidePublishedDeck.snapshot();
       if (!draft.changed) {
@@ -841,20 +866,26 @@ window.mountSlidePublisher = function (options) {
       // Reusing the target version makes retries safe after a lost confirmation.
       if (previousAttempt?.signature === signature) state.revision = previousAttempt.revision;
       else previousAttempt = { signature, revision: state.revision };
-      const revision = await window.slidePublishAPI.publish({
-        token: secret, baseRevision: draft.baseRevision, snapshot: state, assets: draft.assets, onProgress: setStatus
-      });
+      const payload = { baseRevision: draft.baseRevision, snapshot: state, assets: draft.assets };
+      setStatus('正在发布…');
+      const revision = secret
+        ? await window.slidePublishAPI.publish({ ...payload, token: secret, onProgress: setStatus })
+        : (await localRequest('publish', payload, nonce)).revision;
+      if (revision !== state.revision) throw new Error('未确认发布版本，请重试。');
       afterCommit(state);
-      token = secret;
+      if (secret) token = secret;
       previousAttempt = null;
       pendingRevision = revision;
-      if (hasVault && remember.checked) {
+      if (secret && hasVault && remember.checked) {
         remember.checked = false;
         void rememberCredential(secret);
       }
       waitForSite(revision);
     } catch (error) {
-      if (error.code === 'auth') {
+      if (error.code === 'unavailable' || (!secret && error.code === 'auth')) {
+        setStatus(error.message);
+        fallback.hidden = false;
+      } else if (error.code === 'auth') {
         token = '';
         optInToVault(false);
         showCredentials(error.message);
@@ -867,21 +898,23 @@ window.mountSlidePublisher = function (options) {
     }
   }
   button.hidden = false;
-  button.addEventListener('click', async () => {
-    if (dialog.open) return;
+  button.addEventListener('click', event => {
+    if (!event.isTrusted || dialog.open) return;
     form.hidden = true;
+    fallback.hidden = true;
     dialog.showModal();
     if (!publication.ready) {
       setStatus('暂时无法读取已发布版本，请刷新页面后重试。');
       return;
     }
-    if (!token) token = await restoreCredential();
+    void publish(token);
+  });
+  fallback.addEventListener('click', async () => {
+    fallback.hidden = true;
+    const stored = await restoreCredential();
     if (!dialog.open) return;
-    if (token) void publish(token);
-    else {
-      ++monitor;
-      showCredentials('首次发布需要验证网站所有者身份。发布会更新全部页面的文字、讲稿和图片。');
-    }
+    if (stored) void publish(stored);
+    else showCredentials('');
   });
   form.addEventListener('submit', event => {
     event.preventDefault();

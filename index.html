@@ -122,6 +122,53 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
   .edit-mode .user-image.is-selected { outline: none; }
   .edit-mode .user-image.is-selected .image-handle { display: none; }
 }
+.header-actions #publish-button, #publish-submit {
+  background: #f2c4a9;
+  color: #362217;
+  font-weight: 600;
+}
+.header-actions #publish-button:hover, #publish-submit:hover { background: #ffdbc6; }
+#publish-dialog {
+  width: min(440px, calc(100vw - 28px));
+  max-height: min(620px, 85dvh);
+  margin: auto;
+  padding: 24px;
+  background: #fbfaf7;
+  color: #282420;
+  border: 1px solid #cabdb4;
+  border-radius: 14px;
+  box-shadow: 0 24px 80px #18181838;
+  text-align: left;
+}
+#publish-dialog::backdrop { background: #18181870; }
+#publish-dialog header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#publish-dialog h2 { margin: 0; font-size: 21px; }
+#publish-close { display: grid; place-items: center; width: 36px; height: 36px; color: #453b35; }
+#publish-close:hover { background: #ece5de; }
+#publish-status { margin: 14px 0 4px; line-height: 1.6; }
+#publish-dialog details { margin: 16px 0; font-size: 14px; }
+#publish-dialog summary, #publish-dialog a { cursor: pointer; color: #893b26; }
+#publish-dialog ol { padding-left: 22px; line-height: 1.6; }
+#publish-dialog li + li { margin-top: 6px; }
+#publish-form label { display: block; font-size: 14px; }
+#publish-token {
+  display: block; width: 100%; margin: 6px 0; padding: 9px 11px; border: 1px solid #b5a79e;
+  background: white; color: #282420; border-radius: 7px; font-size: 16px; color-scheme: light;
+}
+.publish-hint { color: #665d56; font-size: 13px; margin: 6px 0 10px; }
+#publish-remember-label { cursor: pointer; }
+#publish-remember { vertical-align: middle; margin: 0 5px 0 0; }
+#publish-submit { display: block; margin: 18px 0 0 auto; padding: 8px 16px; }
+@media (max-width: 700px) {
+  .workbench-open #publish-button span { display: inline; }
+  .workbench-open #publish-button svg { display: none; }
+  .workbench-open .masthead { gap: 6px; padding-inline: 8px; }
+  .workbench-open .header-actions { gap: 0; }
+}
+@media (max-width: 380px) {
+  .workbench-open .brand-mark { display: none; }
+}
+@media print { #publish-dialog { display: none !important; } }
 </style>
 </head>
 <body data-source="6e0b0f4eeca56c3887367021a8eefe7f65a0aba2c4432d3872bd2bcac9d003c7" data-start="1">
@@ -136,6 +183,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
     <input id="image-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="选择要插入的图片" hidden>
     <button id="remove-image-button" title="删除选中图片（Delete）" aria-label="删除选中图片" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>删除图片</span></button>
     <button id="save-button" class="save" title="下载当前HTML文件" aria-label="保存HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>保存HTML</span></button>
+    <button id="publish-button" title="发布到原分享链接" aria-label="发布" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></svg><span>发布</span></button>
     <button id="back-to-show-button" title="返回演示" aria-label="返回演示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg><span>返回演示</span></button>
   </div>
 </header>
@@ -155,6 +203,22 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 <div id="overview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="overview-title" hidden><div class="modal-panel"><div class="panel-head"><h2 id="overview-title">分享目录<small style="color:#a6a6a2;font-size:14px;margin-left:12px">25页</small></h2><button data-close aria-label="关闭目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><input id="overview-search" class="overview-search" type="search" placeholder="找一页内容…" aria-label="搜索页面"><div class="overview-list"><button data-overview-index="0"><span class="index">01</span><span class="label">实习分享<small>开场</small></span></button><button data-overview-index="1"><span class="index">02</span><span class="label">介绍<small>开场</small></span></button><button data-overview-index="2"><span class="index">03</span><span class="label">目录<small>开场</small></span></button><button data-overview-index="3"><span class="index">04</span><span class="label">实习目的<small>目的</small></span></button><button data-overview-index="4"><span class="index">05</span><span class="label">先看自己能拿出多长时间<small>目的</small></span></button><button data-overview-index="5"><span class="index">06</span><span class="label">第一段，可以从相关岗位起步<small>机会</small></span></button><button data-overview-index="6"><span class="index">07</span><span class="label">投递渠道<small>机会</small></span></button><button data-overview-index="7"><span class="index">08</span><span class="label">侧重点<small>机会</small></span></button><button data-overview-index="8"><span class="index">09</span><span class="label">Resume Coach - 简历分析与修改<small>简历</small></span></button><button data-overview-index="9"><span class="index">10</span><span class="label">JD<small>简历</small></span></button><button data-overview-index="10"><span class="index">11</span><span class="label">WonderCV<small>简历</small></span></button><button data-overview-index="11"><span class="index">12</span><span class="label">简历先让人看见相关证据<small>简历</small></span></button><button data-overview-index="12"><span class="index">13</span><span class="label">STAR原则<small>简历</small></span></button><button data-overview-index="13"><span class="index">14</span><span class="label">实习经历<small>工作</small></span></button><button data-overview-index="14"><span class="index">15</span><span class="label">接任务，先把四件事问清<small>职场</small></span></button><button data-overview-index="15"><span class="index">16</span><span class="label">六点没做完，先分清优先级<small>职场</small></span></button><button data-overview-index="16"><span class="index">17</span><span class="label">带着方案，找能决定的人确认<small>职场</small></span></button><button data-overview-index="17"><span class="index">18</span><span class="label">AI做完之后，还得自己看一遍<small>职场</small></span></button><button data-overview-index="18"><span class="index">19</span><span class="label">中途同步，交付分清三类<small>职场</small></span></button><button data-overview-index="19"><span class="index">20</span><span class="label">沟通清楚，关键事项留文字<small>职场</small></span></button><button data-overview-index="20"><span class="index">21</span><span class="label">多沟通<small>职场</small></span></button><button data-overview-index="21"><span class="index">22</span><span class="label">解决过的问题，要留下方法<small>职场</small></span></button><button data-overview-index="22"><span class="index">23</span><span class="label">主业之外，给自己留点时间<small>职场</small></span></button><button data-overview-index="23"><span class="index">24</span><span class="label">起步时，很多问题都可以开口问<small>职场</small></span></button><button data-overview-index="24"><span class="index">25</span><span class="label">交流与联系<small>交流</small></span></button><p class="no-result" id="no-result" hidden>没有找到这页，换个关键词试试。</p></div></div></div>
 <div id="image-modal" class="modal image-modal" role="dialog" aria-modal="true" aria-label="原图预览" hidden><div class="image-dialog"><div id="zoom-viewport" class="zoom-viewport"><div class="zoom-surface"><img id="zoom-image" alt="" draggable="false"></div></div><div class="image-tools" aria-label="原图工具"><div id="image-gallery" class="image-gallery"><button id="gallery-prev" aria-label="上一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><span id="gallery-count">1 / 1</span><button id="gallery-next" aria-label="下一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><button id="zoom-out" aria-label="缩小图片">−</button><span id="zoom-level">适应</span><button id="zoom-in" aria-label="放大图片">＋</button><button id="zoom-fit" aria-label="图片适应窗口">适应</button></div><button class="close-image" data-close aria-label="关闭原图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><span class="image-hint">同页配图可左右切换 · 放大后可拖动 · 按Esc返回</span></div></div>
 <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden><div class="modal-panel help-panel"><div class="panel-head"><h2 id="help-title">轻松开讲</h2><button data-close aria-label="关闭操作说明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="help-rows"><div><span>翻页</span><kbd>← → / 空格</kbd></div><div><span>跳到开场／结束</span><kbd>Home / End</kbd></div><div><span>全屏放映</span><kbd>F</kbd></div><div><span>目录／讲稿／编辑</span><kbd>O / N / E</kbd></div><div><span>返回演示／退出全屏</span><kbd>Esc</kbd></div><p>点“编辑页面”修改文字或讲稿。点“插入图片”选取本地图片，拖动图片可移动，拖动角上的圆点可等比缩放。点“保存HTML”下载含图片的演示文件。</p></div></div></div>
+<dialog id="publish-dialog" aria-labelledby="publish-heading">
+  <header><h2 id="publish-heading">发布到原分享链接</h2><button id="publish-close" type="button" aria-label="关闭发布窗口"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></header>
+  <p id="publish-status" role="status" aria-live="polite"></p>
+  <form id="publish-form" autocomplete="off">
+    <details id="publish-instructions"><summary>如何取得发布授权</summary>
+      <ol><li>用网站所有者账号<strong>uuoov</strong>登录GitHub，<a href="https://github.com/settings/personal-access-tokens/new?name=Internship+slides&amp;target_name=uuoov&amp;contents=write&amp;expires_in=90" target="_blank" rel="noopener noreferrer">创建专用令牌</a>。</li>
+      <li>在Repository access选择“Only select repositories”，勾选<strong>internship-sharing</strong>。</li>
+      <li>确认Contents为“Read and write”，点“Generate token”，复制令牌并粘贴到下方。</li></ol>
+    </details>
+    <label for="publish-token">GitHub发布令牌</label>
+    <input id="publish-token" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" required>
+    <p class="publish-hint">默认仅在当前标签页使用授权。</p>
+    <label id="publish-remember-label" hidden><input id="publish-remember" type="checkbox">用此设备的密码管理器记住授权</label>
+    <button id="publish-submit" type="submit">授权并发布</button>
+  </form>
+</dialog>
 <div hidden><div class="note-source" id="note-1" hidden></div><div class="note-source" id="note-2" hidden></div><div class="note-source" id="note-3" hidden>今天从这五个问题聊起（0:30—1:00）
 今天大概沿着这条路走：为什么实习，机会从哪里来，简历怎么改，实习生进去以后到底做什么，还有跟同事相处、接任务时的一些体会。
 
@@ -312,12 +376,530 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
 [预留约3分钟现场交流。可以从找岗位、改简历、第一次上班的沟通与相处三个方向接问题。已有话题尽量结合本人经历回答；没有经历过的就直说，不把一家公司的做法当成所有公司的规则。若现场暂时没人发问，可邀请一位同学说说今天最想进一步了解的部分，停顿等待，不额外增加一页Q&amp;A。]
 
 资料出处：36（对应逐页大纲）</div></div>
-<script>// Inserted pictures live in the slide DOM so a saved HTML also works offline.
+<script>// Public slide content is data only. The authored layout and scripts remain in the presentation.
+window.slidePublishedDeck = (() => {
+  'use strict';
+  const initial = 'initial';
+  const mediaPath = /^published\/media\/[0-9a-f]{64}\.(?:jpg|png|gif|webp)$/;
+  const textNodes = new Map(Array.from(document.querySelectorAll('[data-editable]'), el => [el.dataset.editable, el]));
+  const noteNodes = new Map(Array.from(document.querySelectorAll('.note-source[id]'), el => [el.id, el]));
+  const slides = new Map(Array.from(document.querySelectorAll('#canvas [data-slide]'), el => [Number(el.dataset.slide), el]));
+  let revision = initial, baseline, loading;
+  let publishedPaths = new Set();
+
+  function requireValue(condition, message) {
+    if (!condition) throw new Error(message || '已发布的幻灯片数据格式有误。');
+  }
+  function dictionary(value) {
+    return value !== null && typeof value === 'object' && !Array.isArray(value);
+  }
+  function readText(nodes, editable) {
+    const values = Object.create(null);
+    for (const [id, el] of nodes) {
+      // Only a live editor may contain <div> or <br> for a typed newline.
+      const visibleEditor = editable && el.isContentEditable && el.closest('[data-slide]')?.getAttribute('aria-hidden') !== 'true';
+      const value = visibleEditor && el.childElementCount ? el.innerText : el.textContent;
+      values[id] = value.replace(/\r\n?/g, '\n');
+    }
+    return values;
+  }
+  function checkText(input, nodes) {
+    requireValue(dictionary(input));
+    const result = Object.create(null);
+    for (const [key, value] of Object.entries(input)) {
+      requireValue(nodes.has(key) && typeof value === 'string');
+      result[key] = value.replace(/\r\n?/g, '\n');
+    }
+    return result;
+  }
+  function checkImage(value) {
+    requireValue(dictionary(value) && typeof value.id === 'string' && /^[a-f0-9]{32}$/.test(value.id));
+    const { id, page, order, name, path, x, y, w, h } = value;
+    const slide = slides.get(page);
+    requireValue(slide && Number.isSafeInteger(order) && order >= 0);
+    requireValue(typeof name === 'string' && name.length > 0 && !/[\/\\\u0000-\u001f\u007f]/.test(name));
+    requireValue(typeof path === 'string' && mediaPath.test(path));
+    requireValue([x, y, w, h].every(Number.isFinite) && w > 0 && h > 0);
+    // CSS serializes positions with limited precision. Tolerate only subpixel roundoff at an edge.
+    const bw = slide.clientWidth, bh = slide.clientHeight, epsilon = 0.05;
+    requireValue(x >= -epsilon && y >= -epsilon && x + w <= bw + epsilon && y + h <= bh + epsilon);
+    const hundredths = n => Math.round(n * 100) / 100;
+    const width = Math.max(0.01, Math.min(bw, hundredths(w)));
+    const height = Math.max(0.01, Math.min(bh, hundredths(h)));
+    return { id, page, order, x: Math.max(0, Math.min(bw - width, hundredths(x))),
+      y: Math.max(0, Math.min(bh - height, hundredths(y))), w: width, h: height, name, path };
+  }
+  function checkManifest(input) {
+    requireValue(dictionary(input) && input.version === 1);
+    requireValue(typeof input.revision === 'string' && (input.revision === initial || /^[0-9a-f]{32}$/.test(input.revision)));
+    const texts = checkText(input.texts, textNodes), notes = checkText(input.notes, noteNodes);
+    requireValue(Array.isArray(input.images));
+    const images = input.images.map(checkImage);
+    requireValue(new Set(images.map(image => image.id)).size === images.length);
+    if (input.revision === initial) requireValue(!images.length && !Object.keys(texts).length && !Object.keys(notes).length);
+    return { version: 1, revision: input.revision, texts, notes, images };
+  }
+  function attachImage(image) {
+    const box = document.createElement('div'), img = document.createElement('img');
+    box.className = 'shape user-image';
+    box.dataset.userImage = image.id;
+    box.dataset.imageOrder = String(image.order);
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', image.name);
+    Object.assign(box.style, { left: image.x + 'px', top: image.y + 'px', width: image.w + 'px', height: image.h + 'px' });
+    img.alt = image.name;
+    img.draggable = false;
+    img.src = image.path;
+    box.append(img);
+    slides.get(image.page).append(box);
+  }
+  function apply(manifest) {
+    // An empty first publication represents the original slides. Keep the draft
+    // namespace so work started before this feature remains available.
+    if (!Object.keys(manifest.texts).length && !Object.keys(manifest.notes).length && !manifest.images.length) return;
+    for (const [id, value] of Object.entries(manifest.texts)) textNodes.get(id).textContent = value;
+    for (const [id, value] of Object.entries(manifest.notes)) noteNodes.get(id).textContent = value;
+    document.querySelectorAll('#canvas .user-image[data-user-image]').forEach(box => box.remove());
+    manifest.images.forEach(attachImage);
+    document.body.dataset.imageRevision = manifest.revision;
+  }
+
+  async function readAsset(src) {
+    const match = /^data:image\/(png|jpeg|gif|webp);base64,/.exec(src);
+    requireValue(match, '图片格式不支持发布。请重新插入PNG、JPEG、GIF或WebP图片。');
+    const base64 = src.slice(match[0].length);
+    const raw = atob(base64);
+    const bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    const mime = match[1];
+    const raster = mime === 'png' ? raw.startsWith('\x89PNG\r\n\x1a\n')
+      : mime === 'jpeg' ? raw.startsWith('\xff\xd8\xff')
+      : mime === 'gif' ? raw.startsWith('GIF87a') || raw.startsWith('GIF89a')
+      : raw.startsWith('RIFF') && raw.slice(8, 12) === 'WEBP';
+    requireValue(raster, '无法识别图片内容。请重新插入图片。');
+    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+    const digest = Array.from(hash, byte => byte.toString(16).padStart(2, '0')).join('');
+    return { path: 'published/media/' + digest + '.' + (mime === 'jpeg' ? 'jpg' : mime), base64 };
+  }
+  async function capture() {
+    const texts = readText(textNodes, true), notes = readText(noteNodes, false);
+    const existingPaths = publishedPaths;
+    // Freeze the full click-time snapshot before the first asynchronous image digest.
+    const records = Array.from(document.querySelectorAll('#canvas .user-image[data-user-image]'), box => {
+      const img = box.querySelector('img');
+      requireValue(img, '有一张插入的图片缺少素材。');
+      return { id: box.dataset.userImage, page: Number(box.parentElement.dataset.slide),
+        order: Number(box.dataset.imageOrder || 0), x: parseFloat(box.style.left), y: parseFloat(box.style.top),
+        w: parseFloat(box.style.width), h: parseFloat(box.style.height), name: img.alt || '插入的图片',
+        path: img.getAttribute('src') || '' };
+    });
+    const images = [], assets = new Map();
+    for (const record of records) {
+      if (record.path.startsWith('data:')) {
+        const asset = await readAsset(record.path);
+        record.path = asset.path;
+        if (!existingPaths.has(asset.path)) assets.set(asset.path, asset);
+      }
+      images.push(checkImage(record));
+    }
+    requireValue(new Set(images.map(image => image.id)).size === images.length, '有重复的图片标识，请重新插入重复的图片。');
+    return { content: { texts, notes, images }, assets: Array.from(assets.values()) };
+  }
+  function contentKey({ texts, notes, images }) {
+    // DOM traversal order is stable even if an external writer reordered object keys.
+    return JSON.stringify([Array.from(textNodes.keys(), key => texts[key]), Array.from(noteNodes.keys(), key => notes[key]), images]);
+  }
+  async function loadPublic() {
+    const allowed = ['sharing.internship.liangzhicong.com', 'localhost', '127.0.0.1', '[::1]'];
+    if (document.body.dataset.offline === 'true' || !['http:', 'https:'].includes(location.protocol) || !allowed.includes(location.hostname)) {
+      return { revision, ready: false };
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8500);
+    try {
+      const url = new URL('published/slides.json', document.baseURI);
+      url.searchParams.set('v', Date.now());
+      const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal: controller.signal });
+      requireValue(response.ok, '未能读取线上版本。请刷新页面后再发布。');
+      const manifest = checkManifest(await response.json());
+      apply(manifest);
+      const { content } = await capture();
+      remember(manifest.revision, content);
+      return { revision, ready: true };
+    } catch (error) {
+      return { revision, ready: false, error: error.message || '未能读取线上版本。请刷新后再发布。' };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  function load() {
+    if (!loading) loading = loadPublic();
+    return loading;
+  }
+  async function snapshot() {
+    const loaded = await load();
+    requireValue(loaded.ready, '请打开在线演示并刷新，读取当前公开版本后再发布。');
+    const baseRevision = revision, oldBaseline = baseline;
+    const { content, assets } = await capture();
+    const newRevision = crypto.randomUUID().replace(/-/g, '');
+    return { snapshot: { version: 1, revision: newRevision, ...content }, assets,
+      changed: contentKey(content) !== oldBaseline, baseRevision };
+  }
+  function remember(newRevision, content) {
+    baseline = contentKey(content);
+    publishedPaths = new Set(content.images.map(image => image.path));
+    revision = newRevision;
+  }
+  function markPublished(snapshot) {
+    const normalized = checkManifest(snapshot);
+    remember(normalized.revision, normalized);
+  }
+  return { load, snapshot, markPublished, get revision() { return revision; } };
+})();
+
+(() => {
+  'use strict';
+
+  const apiOrigin = 'https://api.github.com';
+  const repository = '/repos/uuoov/internship-sharing';
+  const manifestPath = 'published/slides.json';
+  const ownerId = 153625659;
+  const blobLimit = 100 * 1024 * 1024;
+  const mediaPath = /^published\/media\/([0-9a-f]{64})\.(png|jpg|webp|gif)$/;
+  const gitSha = /^[a-f0-9]{40}$/;
+  const authMessage = '请使用仓库所有者的有效GitHub令牌，并允许读写internship-sharing仓库的内容。';
+  const conflictMessage = '线上版本已更新。请先核对最新版本，再发布修改。';
+  const networkMessage = '暂时无法连接GitHub。请检查网络后重试。';
+
+  function failure(code, message) {
+    return Object.assign(new Error(message), { code });
+  }
+
+  function checkedSha(value) {
+    if (typeof value !== 'string' || !gitSha.test(value)) {
+      throw failure('upload', 'GitHub返回的信息不完整，请重试。');
+    }
+    return value;
+  }
+
+  function isMap(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function compareManifest(first, second) {
+    const canonical = data => JSON.stringify(data, (_, value) =>
+      isMap(value) ? Object.fromEntries(Object.keys(value).sort().map(key => [key, value[key]])) : value
+    );
+    return canonical(first) === canonical(second);
+  }
+
+  function isRevision(value) {
+    return typeof value === 'string' && value.length > 0 && value.length <= 160;
+  }
+
+  function serializeSnapshot(snapshot) {
+    if (!isMap(snapshot) || snapshot.version !== 1 || !isRevision(snapshot.revision) ||
+        !isMap(snapshot.texts) || !isMap(snapshot.notes) || !Array.isArray(snapshot.images) ||
+        !Object.values(snapshot.texts).every(value => typeof value === 'string') ||
+        !Object.values(snapshot.notes).every(value => typeof value === 'string')) {
+      throw failure('invalid', '修改内容不完整，请重新打开编辑工具。');
+    }
+    const content = JSON.stringify({
+      version: 1, revision: snapshot.revision, texts: snapshot.texts, notes: snapshot.notes, images: snapshot.images
+    });
+    if (new Blob([content]).size > blobLimit) throw failure('invalid', '修改内容超出GitHub单文件上限。');
+    return content;
+  }
+
+  async function checkAsset(asset) {
+    const match = typeof asset?.path === 'string' && mediaPath.exec(asset.path);
+    const data = asset?.base64;
+    if (!match || typeof data !== 'string' || !data.length || data.length % 4 !== 0 ||
+        data.length > 4 * Math.ceil(blobLimit / 3) || /[^A-Za-z0-9+/=]/.test(data)) {
+      throw failure('invalid', '图片数据或格式有误，请重新插入图片。');
+    }
+    let bytes;
+    try {
+      const binary = atob(data);
+      if (binary.length > blobLimit) throw new Error();
+      bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    } catch {
+      throw failure('invalid', '图片无法读取或超出GitHub单文件上限，请重新选择图片。');
+    }
+    const head = (start, values) => values.every((byte, i) => bytes[start + i] === byte);
+    const signatures = {
+      png: () => head(0, [137, 80, 78, 71, 13, 10, 26, 10]),
+      jpg: () => head(0, [255, 216, 255]),
+      gif: () => head(0, [71, 73, 70, 56]) && [55, 57].includes(bytes[4]) && bytes[5] === 97,
+      webp: () => head(0, [82, 73, 70, 70]) && head(8, [87, 69, 66, 80])
+    };
+    if (!signatures[match[2]]()) throw failure('invalid', '图片内容与文件格式不匹配，请重新插入。');
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    const actual = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+    if (actual !== match[1]) throw failure('invalid', '图片校验失败，请重新插入后再发布。');
+  }
+
+  async function request(token, path, { method = 'GET', body, raw = false } = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), method === 'POST' ? 90000 : 25000);
+    try {
+      const headers = {
+        Accept: raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json',
+        Authorization: 'Bearer ' + token,
+        'X-GitHub-Api-Version': '2022-11-28'
+      };
+      if (body !== undefined) headers['Content-Type'] = 'application/json';
+      const response = await fetch(apiOrigin + path, {
+        method, headers, body: body === undefined ? undefined : JSON.stringify(body),
+        credentials: 'omit', redirect: 'error', cache: 'no-store', referrerPolicy: 'no-referrer',
+        signal: controller.signal
+      });
+      if (!response.ok) {
+        const status = response.status;
+        if (status === 429 || (status === 403 &&
+            (response.headers.has('Retry-After') || response.headers.get('X-RateLimit-Remaining') === '0'))) {
+          throw failure('rate_limit', 'GitHub暂时限制了请求频率，请稍后重试。');
+        }
+        if (status === 401 || status === 403 || (status === 404 && method !== 'GET')) {
+          throw failure('auth', authMessage);
+        }
+        if (method === 'PATCH' && (status === 409 || status === 422)) throw failure('conflict', conflictMessage);
+        if (status >= 500) throw failure('network', networkMessage);
+        throw failure('upload', 'GitHub未能完成这次发布，请稍后重试。');
+      }
+      return await response.json();
+    } catch (err) {
+      if (err instanceof Error && typeof err.code === 'string') throw err;
+      throw failure('network', networkMessage);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function publishedState(token) {
+    const ref = await request(token, repository + '/git/ref/heads/main');
+    const head = checkedSha(ref.object?.sha);
+    const snapshot = await request(token, repository + '/contents/' + manifestPath + '?ref=' + head, { raw: true });
+    if (snapshot?.version !== 1 || !isRevision(snapshot.revision)) {
+      throw failure('upload', '线上演示内容暂时无法读取，请稍后重试。');
+    }
+    return { head, snapshot };
+  }
+
+  async function publish({ token, baseRevision, snapshot, assets = [], onProgress }) {
+    if (typeof token !== 'string' || !token.trim()) throw failure('auth', authMessage);
+    token = token.trim();
+    if (!isRevision(baseRevision) || !Array.isArray(assets)) throw failure('invalid', '当前草稿数据不完整。');
+    const content = serializeSnapshot(snapshot);
+    const target = JSON.parse(content);
+    function report(message) {
+      if (typeof onProgress === 'function') onProgress(message);
+    }
+    report('正在验证发布身份…');
+    const user = await request(token, '/user');
+    if (user?.id !== ownerId) throw failure('auth', authMessage);
+
+    const baseline = await publishedState(token);
+    if (baseline.snapshot.revision === target.revision) {
+      if (compareManifest(baseline.snapshot, target)) return target.revision;
+      throw failure('conflict', conflictMessage);
+    }
+    if (baseline.snapshot.revision !== baseRevision) throw failure('conflict', conflictMessage);
+
+    const unique = new Map();
+    for (const asset of assets) {
+      const previous = unique.get(asset?.path);
+      if (previous && previous.base64 === asset.base64) continue;
+      if (previous) throw failure('invalid', '同一图片存在不同的内容，请重新插入。');
+      await checkAsset(asset);
+      unique.set(asset.path, { path: asset.path, base64: asset.base64 });
+    }
+    const commit = await request(token, repository + '/git/commits/' + baseline.head);
+    const baseTree = checkedSha(commit.tree?.sha);
+    const tree = [];
+    async function addBlob(path, content, encoding) {
+      const blob = await request(token, repository + '/git/blobs', { method: 'POST', body: { content, encoding } });
+      tree.push({ path, mode: '100644', type: 'blob', sha: checkedSha(blob.sha) });
+    }
+    for (const asset of unique.values()) {
+      report('正在上传图片（' + (tree.length + 1) + '/' + unique.size + '）…');
+      await addBlob(asset.path, asset.base64, 'base64');
+    }
+    report('正在提交演示修改…');
+    await addBlob(manifestPath, content, 'utf-8');
+    const newTree = await request(token, repository + '/git/trees', {
+      method: 'POST', body: { base_tree: baseTree, tree }
+    });
+    const newCommit = await request(token, repository + '/git/commits', {
+      method: 'POST', body: { message: '更新实习分享演示内容', tree: checkedSha(newTree.sha), parents: [baseline.head] }
+    });
+    const newHead = checkedSha(newCommit.sha);
+    try {
+      await request(token, repository + '/git/refs/heads/main', {
+        method: 'PATCH', body: { sha: newHead, force: false }
+      });
+    } catch (err) {
+      // The ref update may have reached GitHub even if its response was lost.
+      if (err.code !== 'network' && err.code !== 'conflict') throw err;
+      let current;
+      try { current = await publishedState(token); } catch { throw err; }
+      if (compareManifest(current.snapshot, target)) return target.revision;
+      if (current.snapshot.revision !== baseRevision) throw failure('conflict', conflictMessage);
+      throw err;
+    }
+    return target.revision;
+  }
+
+  window.slidePublishAPI = Object.freeze({ publish });
+})();
+
+// The edit window keeps the owner's credential separate from deck content and downloads.
+window.mountSlidePublisher = function (options) {
+  'use strict';
+  const { publication, beforeSnapshot, afterCommit } = options;
+  const button = document.getElementById('publish-button');
+  const dialog = document.getElementById('publish-dialog');
+  if (!button || !dialog || (!publication.ready && !publication.error)) return;
+  const form = document.getElementById('publish-form');
+  const input = document.getElementById('publish-token');
+  const remember = document.getElementById('publish-remember');
+  const status = document.getElementById('publish-status');
+  const close = document.getElementById('publish-close');
+  const credentialId = 'uuoov@internship-sharing';
+  const vaultFlag = 'internship-sharing-use-password-manager';
+  const hasVault = location.protocol === 'https:' && typeof window.PasswordCredential === 'function' && !!navigator.credentials;
+  document.getElementById('publish-remember-label').hidden = !hasVault;
+  let token = '', writing = false, pendingRevision = '', monitor = 0, previousAttempt;
+  const setStatus = text => { status.textContent = text; };
+  function showCredentials(message) {
+    setStatus(message);
+    form.hidden = false;
+    input.value = '';
+    input.focus();
+  }
+  function optInToVault(value) {
+    try {
+      if (value) localStorage.setItem(vaultFlag, '1');
+      else localStorage.removeItem(vaultFlag);
+    } catch {}
+  }
+  async function restoreCredential() {
+    try {
+      if (!hasVault || localStorage.getItem(vaultFlag) !== '1') return '';
+      const credential = await navigator.credentials.get({ password: true, mediation: 'optional' });
+      return credential?.id === credentialId ? credential.password : '';
+    } catch { return ''; }
+  }
+  async function rememberCredential(secret) {
+    try {
+      await navigator.credentials.store(new PasswordCredential({ id: credentialId, password: secret, name: '实习分享会发布' }));
+      optInToVault(true);
+    } catch {}
+  }
+  async function checkLive(revision) {
+    const attempt = ++monitor;
+    const deadline = Date.now() + 180000;
+    while (attempt === monitor && Date.now() < deadline) {
+      try {
+        const url = new URL('published/slides.json', document.baseURI);
+        url.searchParams.set('v', Date.now());
+        const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(8000) });
+        if (response.ok && (await response.json()).revision === revision && attempt === monitor) {
+          pendingRevision = '';
+          setStatus('新版已上线。别人打开原分享链接就能看到这次修改。');
+          return;
+        }
+      } catch {}
+      if (attempt !== monitor) return;
+      await new Promise(resolve => setTimeout(resolve, 4000));
+    }
+    if (attempt === monitor) setStatus('修改已提交，网站还在更新。稍后再点“发布”可查看上线状态。');
+  }
+  function waitForSite(revision) {
+    setStatus('修改已提交，正在等待原链接更新。你可以关闭此窗口继续编辑。');
+    void checkLive(revision);
+  }
+  async function publish(secret) {
+    if (writing) return;
+    ++monitor;
+    writing = true;
+    close.disabled = true;
+    form.hidden = true;
+    input.value = '';
+    setStatus('正在整理本次修改…');
+    try {
+      await beforeSnapshot();
+      const draft = await window.slidePublishedDeck.snapshot();
+      if (!draft.changed) {
+        if (pendingRevision) waitForSite(pendingRevision);
+        else setStatus('当前内容和已发布版本一致，没有需要发布的修改。');
+        return;
+      }
+      const state = draft.snapshot;
+      const signature = JSON.stringify([draft.baseRevision, state.texts, state.notes, state.images]);
+      // Reusing the target version makes retries safe after a lost confirmation.
+      if (previousAttempt?.signature === signature) state.revision = previousAttempt.revision;
+      else previousAttempt = { signature, revision: state.revision };
+      const revision = await window.slidePublishAPI.publish({
+        token: secret, baseRevision: draft.baseRevision, snapshot: state, assets: draft.assets, onProgress: setStatus
+      });
+      afterCommit(state);
+      token = secret;
+      previousAttempt = null;
+      pendingRevision = revision;
+      if (hasVault && remember.checked) {
+        remember.checked = false;
+        void rememberCredential(secret);
+      }
+      waitForSite(revision);
+    } catch (error) {
+      if (error.code === 'auth') {
+        token = '';
+        optInToVault(false);
+        showCredentials(error.message);
+      } else if (error.code === 'conflict') {
+        setStatus('其他页面已经发布了新版。你的修改仍在本页，可先点“保存HTML”备份，再刷新核对。');
+      } else setStatus(error.message || '发布未完成，你可以关闭窗口后重试。');
+    } finally {
+      writing = false;
+      close.disabled = false;
+    }
+  }
+  button.hidden = false;
+  button.addEventListener('click', async () => {
+    if (dialog.open) return;
+    form.hidden = true;
+    dialog.showModal();
+    if (!publication.ready) {
+      setStatus('暂时无法读取已发布版本，请刷新页面后重试。');
+      return;
+    }
+    if (!token) token = await restoreCredential();
+    if (!dialog.open) return;
+    if (token) void publish(token);
+    else {
+      ++monitor;
+      showCredentials('首次发布需要验证网站所有者身份。发布会更新全部页面的文字、讲稿和图片。');
+    }
+  });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const secret = input.value.trim();
+    if (!secret || writing) return;
+    void publish(secret);
+  });
+  close.addEventListener('click', () => { if (!writing) dialog.close(); });
+  dialog.addEventListener('cancel', event => { if (writing) event.preventDefault(); });
+  dialog.addEventListener('close', () => { input.value = ''; });
+};
+
+// Inserted pictures live in the slide DOM so a saved HTML also works offline.
 // The browser keeps original image bytes separate from frequently changed positions.
 window.createSlideImageEditor = function (options) {
   'use strict';
   const { canvas, slides, storeKey, getSlide, announce, onSelectionChange } = options;
-  const scope = storeKey + '/' + (document.body.dataset.imageRevision || 'original');
+  let scope = storeKey + '/' + (document.body.dataset.imageRevision || 'original');
   const slideByPage = new Map(slides.map(slide => [slide.dataset.slide, slide]));
   const boxes = new Map();
   const embedded = new Set();
@@ -611,18 +1193,28 @@ window.createSlideImageEditor = function (options) {
       box.querySelectorAll('.image-handle').forEach(handle => handle.remove());
     }
   }
-  return { ready, settled, setEditing, clearSelection, insert, removeSelected, prepareExport };
+  function markPublished(revision, pictures) {
+    document.body.dataset.imageRevision = revision;
+    scope = storeKey + '/' + revision;
+    embedded.clear();
+    for (const { id } of pictures) embedded.add(id);
+    uncommitted.clear();
+  }
+  return { ready, settled, setEditing, clearSelection, insert, removeSelected, prepareExport, markPublished };
 };
 
-(() => {
+(async () => {
   'use strict';
+  const publication = await window.slidePublishedDeck.load();
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const slides = $$('[data-slide]');
   const pageInput = $('#page-input');
   const notePanel = $('#notes-panel');
   const noteBody = $('#notes-content');
-  const storeKey = 'internship-deck-' + document.body.dataset.source;
+  const originalStoreKey = 'internship-deck-' + document.body.dataset.source;
+  const revisionStoreKey = revision => revision && revision !== 'initial' ? originalStoreKey + '-' + revision : originalStoreKey;
+  let storeKey = revisionStoreKey(document.body.dataset.imageRevision);
   let current = 0, editing = false, presenting = false, toastTimer, hintTimer, modalReturn;
   let gallery = [], galleryIndex = 0, imageZoom = 1, imageDrag = null, wheelLocked = false;
   const safeStore = {
@@ -637,8 +1229,20 @@ window.createSlideImageEditor = function (options) {
   const imageFileInput = $('#image-file-input');
   const removeImageButton = $('#remove-image-button');
   const imageEditor = window.createSlideImageEditor({
-    canvas: $('#canvas'), slides, storeKey, getSlide: () => slides[current], announce,
+    canvas: $('#canvas'), slides, storeKey: originalStoreKey, getSlide: () => slides[current], announce,
     onSelectionChange: selected => { removeImageButton.hidden = !selected; }
+  });
+  window.mountSlidePublisher({
+    publication,
+    beforeSnapshot: async () => {
+      if (!notePanel.hidden && editing) saveNote();
+      await imageEditor.settled();
+    },
+    afterCommit: snapshot => {
+      window.slidePublishedDeck.markPublished(snapshot);
+      storeKey = revisionStoreKey(snapshot.revision);
+      imageEditor.markPublished(snapshot.revision, snapshot.images);
+    }
   });
   function fit() {
     const region = $('#stage-area'), style = getComputedStyle(region);
@@ -736,6 +1340,9 @@ window.createSlideImageEditor = function (options) {
     const clone = document.documentElement.cloneNode(true);
     imageEditor.prepareExport(clone);
     const body = $('body', clone);
+    body.dataset.offline = 'true';
+    $('#publish-dialog', clone)?.remove();
+    $('#publish-button', clone)?.remove();
     body.classList.remove('edit-mode', 'presentation-mode', 'show-hint', 'workbench-open');
     body.dataset.start = String(current + 1);
     $$('[data-editable]', clone).forEach(el => {
@@ -944,7 +1551,7 @@ window.createSlideImageEditor = function (options) {
     document.execCommand('insertText', false, value);
   });
   document.addEventListener('keydown', event => {
-    if (event.defaultPrevented) return;
+    if (event.defaultPrevented || $('#publish-dialog')?.open) return;
     const modal = $$('.modal').find(el => !el.hidden);
     if (event.key === 'Escape') {
       if (modal) { event.preventDefault(); closeModal(); return; }
@@ -989,7 +1596,7 @@ window.createSlideImageEditor = function (options) {
     touch = null;
   }, { passive: true });
   document.addEventListener('wheel', event => {
-    if (wheelLocked || editing || !notePanel.hidden || $$('.modal').some(el => !el.hidden)) return;
+    if (wheelLocked || editing || !notePanel.hidden || $('#publish-dialog')?.open || $$('.modal').some(el => !el.hidden)) return;
     if (event.target.closest('video,input,textarea,[contenteditable=true]') || Math.abs(event.deltaY) < 24) return;
     wheelLocked = true; go(current + (event.deltaY > 0 ? 1 : -1));
     setTimeout(() => { wheelLocked = false; }, 550);
@@ -1011,6 +1618,7 @@ window.createSlideImageEditor = function (options) {
   } catch {}
   const initial = Number(location.hash.match(/slide=(\d+)/)?.[1] || document.body.dataset.start || safeStore.get(storeKey + '-page') || 1);
   go(initial - 1, false); fit();
+  if (publication.error) announce('暂时无法读取已发布版本，请刷新页面重试。');
   document.fonts.ready.then(fit);
   window.deck = { go: number => go(number - 1), get current() { return current + 1; }, get total() { return slides.length; } };
 })();

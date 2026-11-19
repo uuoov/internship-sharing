@@ -59,6 +59,69 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 @media(max-width:700px){.quick-nav{right:12px;bottom:12px;padding:4px;font-size:12px}.quick-nav button{height:30px;min-width:30px;padding:4px 6px}.quick-nav .quick-count{min-width:64px}.workbench-open .app{grid-template-rows:64px minmax(0,1fr)80px}.workbench-open .masthead{padding:0 16px}.workbench-open .controls{padding:0 12px 12px}.workbench-open .stage-area{padding:8px}.workbench-open .header-actions button span{display:none}.image-tools{gap:0;padding:4px;left:0;transform:none}.image-tools button{padding:4px 8px}.image-tools span{min-width:36px}.image-gallery{padding-right:4px;margin-right:2px}.zoom-surface{padding:64px 12px 48px}.image-dialog .close-image{padding:10px}.image-hint{left:0;bottom:0;max-width:100%;font-size:11px}}
 @media print{.quick-nav{display:none!important}.app,.workbench-open .app{display:block}.frame,.workbench-open .frame{border-radius:0;box-shadow:none}.stage-area,.workbench-open .stage-area{padding:0}}
 .site-links{display:flex;gap:14px;align-items:center;z-index:4}.site-links.align-right{justify-content:flex-end}.site-link{display:inline-flex;align-items:center;gap:12px;white-space:nowrap;color:#9c4b32;text-decoration:none;border:1.5px solid #b9553852;border-radius:8px;padding:7px 16px;font-size:30px;line-height:38px;background:#fbfaf7e8;box-shadow:0 2px 0 #b9553810}.site-link:hover{background:#f2e7dc;border-color:#b95538}.site-link>span[aria-hidden]{font-size:25px;color:#b95538}.site-link:focus-visible,.image-link:focus-visible{outline:3px solid #b95538;outline-offset:4px}.linked-image .image-link{display:block;position:absolute;inset:0;cursor:pointer}.linked-image .image-link:hover{outline:3px solid #b9553866;outline-offset:-3px}.linked-image .picture-zoom{position:absolute;right:10px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:center;width:44px;height:44px;padding:8px;border-radius:8px;background:#fbfaf7ed;color:#51483f;box-shadow:0 1px 8px #28242026;cursor:zoom-in;opacity:.85}.linked-image .picture-zoom:hover{opacity:1;background:#fff}.linked-image .picture-zoom svg{width:25px;height:25px}.text-shape .title-site-link{color:inherit;text-decoration:underline;text-decoration-color:#b9553866;text-decoration-thickness:2px;text-underline-offset:8px}.text-shape .title-site-link:hover{text-decoration-color:#b95538}.edit-mode .site-link{cursor:text}
+.user-image {
+  position: absolute;
+  pointer-events: none;
+}
+.user-image > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+.edit-mode .user-image {
+  cursor: move;
+  touch-action: none;
+  pointer-events: auto;
+  user-select: none;
+}
+.edit-mode .user-image.is-selected {
+  outline: calc(2 * var(--image-control-unit, 1px)) solid #a34429;
+  outline-offset: 0;
+}
+.image-handle {
+  display: none;
+  position: absolute;
+  width: calc(24 * var(--image-control-unit, 1px));
+  height: calc(24 * var(--image-control-unit, 1px));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  touch-action: none;
+}
+.edit-mode .user-image.is-selected .image-handle {
+  display: grid;
+  place-items: center;
+}
+.image-handle::after {
+  content: '';
+  box-sizing: border-box;
+  width: calc(10 * var(--image-control-unit, 1px));
+  height: calc(10 * var(--image-control-unit, 1px));
+  border: calc(2 * var(--image-control-unit, 1px)) solid #a34429;
+  border-radius: 50%;
+  background: #fff;
+}
+.image-handle[data-corner="nw"], .image-handle[data-corner="ne"] { top: 0; }
+.image-handle[data-corner="sw"], .image-handle[data-corner="se"] { bottom: 0; }
+.image-handle[data-corner="nw"], .image-handle[data-corner="sw"] { left: 0; }
+.image-handle[data-corner="ne"], .image-handle[data-corner="se"] { right: 0; }
+.image-handle[data-corner="nw"] { transform: translate(-50%, -50%); cursor: nwse-resize; }
+.image-handle[data-corner="ne"] { transform: translate(50%, -50%); cursor: nesw-resize; }
+.image-handle[data-corner="sw"] { transform: translate(-50%, 50%); cursor: nesw-resize; }
+.image-handle[data-corner="se"] { transform: translate(50%, 50%); cursor: nwse-resize; }
+@media (max-width: 700px) {
+  .workbench-open #insert-image-button span { display: inline; }
+  .workbench-open .header-actions { flex-shrink: 0; }
+}
+@media (max-width: 400px) {
+  .workbench-open .masthead { gap: 4px; padding: 0 8px; }
+}
+@media print {
+  .edit-mode .user-image.is-selected { outline: none; }
+  .edit-mode .user-image.is-selected .image-handle { display: none; }
+}
 </style>
 </head>
 <body data-source="6e0b0f4eeca56c3887367021a8eefe7f65a0aba2c4432d3872bd2bcac9d003c7" data-start="1">
@@ -67,7 +130,14 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 <header class="masthead">
   <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h12a3 3 0 0 1 3 3v15H7a3 3 0 0 1-3-3V3Z"/><path d="M7 3v18M4 17h15M11 8h4M11 12h4"/></svg></span><span>实习分享<small>梁志聪 · 校园手账</small></span></div>
   <nav class="chapters" aria-label="分享章节"><button data-goto="4">目的</button><button data-goto="6">机会</button><button data-goto="9">简历</button><button data-goto="14">工作</button><button data-goto="15">职场</button></nav>
-  <div class="header-actions"><button id="edit-button" aria-pressed="false" title="编辑文字（E）" aria-label="编辑文字"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"/></svg><span id="edit-label">编辑文字</span></button><button id="save-button" class="save" title="下载当前HTML文件" aria-label="保存HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>保存HTML</span></button><button id="back-to-show-button" title="返回演示" aria-label="返回演示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg><span>返回演示</span></button></div>
+  <div class="header-actions">
+    <button id="edit-button" aria-pressed="false" title="编辑页面（E）" aria-label="编辑页面"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14z"/></svg><span id="edit-label">编辑页面</span></button>
+    <button id="insert-image-button" title="在当前页插入图片" aria-label="插入图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 3 3 4-4 5 5"/></svg><span>插入图片</span></button>
+    <input id="image-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" aria-label="选择要插入的图片" hidden>
+    <button id="remove-image-button" title="删除选中图片（Delete）" aria-label="删除选中图片" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7"/></svg><span>删除图片</span></button>
+    <button id="save-button" class="save" title="下载当前HTML文件" aria-label="保存HTML"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>保存HTML</span></button>
+    <button id="back-to-show-button" title="返回演示" aria-label="返回演示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg><span>返回演示</span></button>
+  </div>
 </header>
 <main class="workspace">
   <div id="stage-area" class="stage-area"><div id="frame" class="frame"><div id="canvas" class="canvas" tabindex="-1"><section class="slide" data-slide="1" data-title="实习分享" aria-label="第1页：实习分享" aria-hidden="false" ><button class="shape image-shape zoomable" data-zoom aria-label="放大第1页配图1" style="left:1216.363px;top:635.800px;width:703.637px;height:444.200px"><img alt="第1页原始配图1" src="assets/330984062d21e18a.png" style="position:absolute;width:272.8810784%;height:243.1315342%;left:-0.0000000%;top:-143.1315342%" draggable="false"></button><div class="shape text-shape" data-shape-text="1-1" style="left:134.407px;top:227.000px;width:691.236px;height:291.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:134.000px"><span data-editable="p1-s1-p0-r0" contenteditable="false" style="font-size:144.000px;font-weight:400;color:#282420">实习分享</span></p></div><div class="shape text-shape" data-shape-text="1-2" style="left:134.407px;top:699.800px;width:614.432px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:55.000px"><span data-editable="p1-s2-p0-r0" contenteditable="false" style="font-size:64.000px;font-weight:400;color:#B95538">梁志聪</span></p></div><div class="shape text-shape" data-shape-text="1-3" style="left:134.407px;top:794.100px;width:672.035px;height:54.000px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:41.000px"><span data-editable="p1-s3-p0-r0" contenteditable="false" style="font-size:48.000px;font-weight:400;color:#282420">2026年11月19日</span></p></div></section><section class="slide" data-slide="2" data-title="介绍" aria-label="第2页：介绍" aria-hidden="true" inert><div class="shape text-shape" data-shape-text="2-0" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p2-s0-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">介绍</span></p></div><div class="shape text-shape" data-shape-text="2-1" style="left:134.407px;top:225.100px;width:961.650px;height:473.200px;padding:7.200px 14.401px 7.200px 14.401px;justify-content:flex-start"><p style="text-align:left;line-height:100.000px"><span data-editable="p2-s1-p0-r0" contenteditable="false" style="font-size:64.000px;font-weight:400;color:#282420">梁志聪</span><span data-editable="p2-s1-p0-r1" contenteditable="false" style="font-size:64.000px;font-weight:400;color:#282420"> </span></p><p style="text-align:left;line-height:100.000px"><span data-editable="p2-s1-p1-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#282420">20</span><span data-editable="p2-s1-p1-r1" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#282420">23</span><span data-editable="p2-s1-p1-r2" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#282420">级生物医学工程专业</span><span data-editable="p2-s1-p1-r3" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#282420">本科生</span></p><p style="text-align:left;line-height:80.000px"><span data-editable="p2-s1-p2-r0" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">2025</span><span data-editable="p2-s1-p2-r1" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">年国家级大学生创新创业训练计划</span><span data-editable="p2-s1-p2-r2" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">项目</span><span data-editable="p2-s1-p2-r3" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420"> </span><span data-editable="p2-s1-p2-r4" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">优秀结题</span></p><p style="text-align:left;line-height:80.000px"><span data-editable="p2-s1-p3-r0" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">2025</span><span data-editable="p2-s1-p3-r1" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">年全国大学生生物医学工程创新设计竞赛</span><span data-editable="p2-s1-p3-r2" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420"> </span><span data-editable="p2-s1-p3-r3" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">一等奖</span></p><p style="text-align:left;line-height:80.000px"><span data-editable="p2-s1-p4-r0" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">2025</span><span data-editable="p2-s1-p4-r1" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">年广东省</span><span data-editable="p2-s1-p4-r2" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">“</span><span data-editable="p2-s1-p4-r3" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">挑战杯</span><span data-editable="p2-s1-p4-r4" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">“</span><span data-editable="p2-s1-p4-r5" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">一等奖</span></p></div><button class="shape image-shape zoomable" data-zoom aria-label="放大第2页配图3" style="left:1217.963px;top:158.300px;width:627.933px;height:682.700px"><img alt="第2页原始配图3" src="assets/af1fb7d94e295744.png" style="position:absolute;width:163.0842493%;height:100.0000000%;left:-31.4703676%;top:-0.0000000%" draggable="false"></button></section><section class="slide" data-slide="3" data-title="目录" aria-label="第3页：目录" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第3页原始配图1" src="assets/5eacf7295597d163.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="3-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p3-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">目录</span></p></div><div class="shape text-shape" data-shape-text="3-2" style="left:115.206px;top:756.000px;width:307.216px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p3-s2-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">目的</span></p></div><div class="shape text-shape" data-shape-text="3-3" style="left:460.824px;top:756.000px;width:307.216px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p3-s3-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">机会</span></p></div><div class="shape text-shape" data-shape-text="3-4" style="left:806.442px;top:756.000px;width:307.216px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p3-s4-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">简历</span></p></div><div class="shape text-shape" data-shape-text="3-5" style="left:1152.060px;top:756.000px;width:307.216px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p3-s5-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">工作</span></p></div><div class="shape text-shape" data-shape-text="3-6" style="left:1497.678px;top:756.000px;width:307.216px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p3-s6-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">职场</span></p></div><div class="shape text-shape" data-shape-text="3-7" style="left:134.407px;top:1031.400px;width:1440.075px;height:30.240px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:28.000px"><span data-editable="p3-s7-p0-r0" contenteditable="false" style="font-size:23.000px;font-weight:400;color:#776F66">实习分享会</span></p></div><div class="shape text-shape" data-shape-text="3-8" style="left:1689.688px;top:1026.000px;width:96.005px;height:41.040px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:right;line-height:30.000px"><span data-editable="p3-s8-p0-r0" contenteditable="false" style="font-size:25.000px;font-weight:400;color:#776F66">02</span></p></div></section><section class="slide" data-slide="4" data-title="实习目的" aria-label="第4页：实习目的" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第4页原始配图1" src="assets/cddd3b68c4d7db88.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="4-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p4-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">实习目的</span></p></div><div class="shape text-shape" data-shape-text="4-2" style="left:192.010px;top:280.800px;width:499.226px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p4-s2-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">考研</span></p></div><div class="shape text-shape" data-shape-text="4-3" style="left:192.010px;top:378.000px;width:499.226px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:43.000px"><span data-editable="p4-s3-p0-r0" contenteditable="false" style="font-size:36.000px;font-weight:400;color:#B95538">毕业要求</span></p></div><div class="shape text-shape" data-shape-text="4-4" style="left:1228.864px;top:280.800px;width:499.226px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p4-s4-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">本科就业</span></p></div><div class="shape text-shape" data-shape-text="4-5" style="left:1228.864px;top:378.000px;width:499.226px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:43.000px"><span data-editable="p4-s5-p0-r0" contenteditable="false" style="font-size:36.000px;font-weight:400;color:#B95538">岗位排雷</span></p></div><div class="shape text-shape" data-shape-text="4-6" style="left:153.608px;top:723.600px;width:576.030px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p4-s6-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">港硕／海外硕士</span></p></div><div class="shape text-shape" data-shape-text="4-7" style="left:192.010px;top:820.800px;width:499.226px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:43.000px"><span data-editable="p4-s7-p0-r0" contenteditable="false" style="font-size:36.000px;font-weight:400;color:#B95538">申请支持</span></p></div><div class="shape text-shape" data-shape-text="4-8" style="left:1228.864px;top:723.600px;width:499.226px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p4-s8-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">保研</span></p></div><div class="shape text-shape" data-shape-text="4-9" style="left:1228.864px;top:820.800px;width:499.226px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:43.000px"><span data-editable="p4-s9-p0-r0" contenteditable="false" style="font-size:36.000px;font-weight:400;color:#B95538">升学安排</span></p></div></section><section class="slide" data-slide="5" data-title="先看自己能拿出多长时间" aria-label="第5页：先看自己能拿出多长时间" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第5页原始配图1" src="assets/bccf88ca4e755243.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="5-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p5-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">先看自己能拿出多长时间</span></p></div><div class="shape text-shape" data-shape-text="5-2" style="left:134.407px;top:345.600px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:56.000px"><span data-editable="p5-s2-p0-r0" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">寒假</span></p></div><div class="shape text-shape" data-shape-text="5-3" style="left:134.407px;top:529.200px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:56.000px"><span data-editable="p5-s3-p0-r0" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">暑假</span></p></div><div class="shape text-shape" data-shape-text="5-4" style="left:134.407px;top:712.800px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:56.000px"><span data-editable="p5-s4-p0-r0" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">公司</span><span data-editable="p5-s4-p0-r1" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">要求</span></p></div><div class="shape text-shape" data-shape-text="5-5" style="left:1555.281px;top:345.600px;width:268.814px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:46.000px"><span data-editable="p5-s5-p0-r0" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">1个月</span></p></div><div class="shape text-shape" data-shape-text="5-6" style="left:1555.281px;top:529.200px;width:268.814px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:46.000px"><span data-editable="p5-s6-p0-r0" contenteditable="false" style="font-size:38.000px;font-weight:400;color:#282420">2个月</span></p></div><div class="shape text-shape" data-shape-text="5-7" style="left:1516.879px;top:712.800px;width:345.618px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:41.000px"><span data-editable="p5-s7-p0-r0" contenteditable="false" style="font-size:34.000px;font-weight:400;color:#282420">3个月以上</span></p></div></section><section class="slide" data-slide="6" data-title="第一段，可以从相关岗位起步" aria-label="第6页：第一段，可以从相关岗位起步" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第6页原始配图1" src="assets/9e07465f275da9d3.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="6-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p6-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">第一段，可以从相关岗位起步</span></p></div></section><section class="slide" data-slide="7" data-title="投递渠道" aria-label="第7页：投递渠道" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第7页原始配图1" src="assets/5678c2a214766689.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape image-shape linked-image" data-zoom style="left:207.011px;top:313.000px;width:621.032px;height:281.000px"><a class="image-link" data-site-link="boss" href="https://www.zhipin.com/" target="_blank" rel="noopener noreferrer" aria-label="打开BOSS直聘官网，新标签页"><img alt="第7页原始配图2" src="assets/62ff95532b361404.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></a><button class="picture-zoom" title="放大截图" aria-label="放大第7页截图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button></div><div class="shape image-shape linked-image" data-zoom style="left:1091.057px;top:313.000px;width:621.032px;height:281.000px"><a class="image-link" data-site-link="bytedance" href="https://jobs.bytedance.com/" target="_blank" rel="noopener noreferrer" aria-label="打开字节跳动招聘官网，新标签页"><img alt="第7页原始配图3" src="assets/aa5e686885f9f2a7.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></a><button class="picture-zoom" title="放大截图" aria-label="放大第7页截图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button></div><div class="shape text-shape" data-shape-text="7-3" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p7-s3-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">投递</span><span data-editable="p7-s3-p0-r1" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">渠道</span></p></div><div class="shape text-shape" data-shape-text="7-4" style="left:134.407px;top:626.400px;width:768.040px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:56.000px"><span data-editable="p7-s4-p0-r0" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">平台</span></p></div><div class="shape text-shape" data-shape-text="7-5" style="left:1094.457px;top:626.400px;width:768.040px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:56.000px"><a class="title-site-link" data-site-link="bytedance" href="https://jobs.bytedance.com/" target="_blank" rel="noopener noreferrer" title="打开字节跳动招聘官网"><span data-editable="p7-s5-p0-r0" contenteditable="false" style="font-size:47.000px;font-weight:400;color:#282420">官网</span></a></p></div><div class="shape text-shape" data-shape-text="7-6" style="left:134.407px;top:872.800px;width:710.437px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:53.000px"><span data-editable="p7-s6-p0-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#282420">推荐／招募</span></p></div><div class="shape text-shape" data-shape-text="7-7" style="left:1420.874px;top:831.600px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:62.000px"><span data-editable="p7-s7-p0-r0" contenteditable="false" style="font-size:52.000px;font-weight:400;color:#B95538">岗位</span></p></div><div class="shape site-links" style="left:207px;top:232px;width:650px;height:56px"><a class="site-link" data-site-link="boss" href="https://www.zhipin.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p7-boss" contenteditable="false">BOSS直聘</span><span aria-hidden="true">↗</span></a><a class="site-link" data-site-link="liepin" href="https://www.liepin.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p7-liepin" contenteditable="false">猎聘</span><span aria-hidden="true">↗</span></a><a class="site-link" data-site-link="zhaopin" href="https://www.zhaopin.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p7-zhaopin" contenteditable="false">智联招聘</span><span aria-hidden="true">↗</span></a></div><div class="shape site-links" style="left:1091px;top:232px;width:621px;height:56px"><a class="site-link" data-site-link="bytedance" href="https://jobs.bytedance.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p7-bytedance" contenteditable="false">字节跳动招聘</span><span aria-hidden="true">↗</span></a></div></section><section class="slide" data-slide="8" data-title="侧重点" aria-label="第8页：侧重点" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第8页原始配图1" src="assets/f26464bf5070f3c7.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="8-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p8-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">侧重</span><span data-editable="p8-s1-p0-r1" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">点</span></p></div><div class="shape text-shape" data-shape-text="8-2" style="left:652.834px;top:302.400px;width:614.432px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p8-s2-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">同一经历</span></p></div><div class="shape text-shape" data-shape-text="8-3" style="left:153.608px;top:810.000px;width:460.824px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:62.000px"><span data-editable="p8-s3-p0-r0" contenteditable="false" style="font-size:52.000px;font-weight:400;color:#B95538">硬件</span></p></div><div class="shape text-shape" data-shape-text="8-4" style="left:729.638px;top:810.000px;width:460.824px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:62.000px"><span data-editable="p8-s4-p0-r0" contenteditable="false" style="font-size:52.000px;font-weight:400;color:#B95538">软件</span></p></div><div class="shape text-shape" data-shape-text="8-5" style="left:1305.668px;top:810.000px;width:460.824px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:62.000px"><span data-editable="p8-s5-p0-r0" contenteditable="false" style="font-size:52.000px;font-weight:400;color:#B95538">产品</span></p></div></section><section class="slide" data-slide="9" data-title="Resume Coach - 简历分析与修改" aria-label="第9页：Resume Coach - 简历分析与修改" aria-hidden="true" inert><div class="shape text-shape" data-shape-text="9-1" style="left:194.610px;top:34.000px;width:1530.880px;height:72.000px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:center"><p style="text-align:left;line-height:38.400px"><span data-editable="p9-s1-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">Resume Coach - </span><span data-editable="p9-s1-p0-r1" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">简历分析与修改</span></p></div><div class="shape video-shape" style="left:194.610px;top:121.600px;width:1530.880px;height:861.200px"><video id="resume-video" controls playsinline preload="metadata" poster="assets/be8c058c8f9e3673.png" aria-label="Resume Coach简历分析与修改演示视频"><source src="assets/99046558e544f604.mp4" type="video/mp4">当前浏览器不支持视频播放，请使用Chrome或Edge打开。</video></div><div class="shape text-shape" data-shape-text="9-group" style="left:220.111px;top:1022.700px;width:1100.000px;height:43.600px;justify-content:center"><p style="line-height:40px;font-size:28px"><a href="http://43.139.47.80:8080/" target="_blank" rel="noopener noreferrer"><span data-editable="p9-group-link" contenteditable="false">网站链接：http://43.139.47.80:8080/</span></a></p></div><div class="shape image-shape" style="left:192.410px;top:1026.200px;width:36.702px;height:36.700px"><img src="assets/b44bd916c75b49e2.png" alt="链接图标"></div></section><section class="slide" data-slide="10" data-title="JD" aria-label="第10页：JD" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第10页原始配图1" src="assets/d9c97ecaee6498ae.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><button class="shape image-shape zoomable" data-zoom aria-label="放大第10页配图2" style="left:575.030px;top:270.000px;width:1192.062px;height:119.000px"><img alt="第10页原始配图2" src="assets/7866145a7aa82cf0.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><button class="shape image-shape zoomable" data-zoom aria-label="放大第10页配图3" style="left:552.029px;top:497.000px;width:1238.064px;height:130.000px"><img alt="第10页原始配图3" src="assets/d2faf249b5033c38.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><button class="shape image-shape zoomable" data-zoom aria-label="放大第10页配图4" style="left:538.028px;top:762.000px;width:1267.066px;height:84.000px"><img alt="第10页原始配图4" src="assets/4fe5771281759ba9.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><div class="shape text-shape" data-shape-text="10-4" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><a class="title-site-link" data-site-link="bytedance" href="https://jobs.bytedance.com/" target="_blank" rel="noopener noreferrer" title="打开字节跳动招聘官网"><span data-editable="p10-s4-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">JD</span></a></p></div><div class="shape text-shape" data-shape-text="10-5" style="left:115.206px;top:270.000px;width:326.417px;height:118.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p10-s5-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#B95538">在哪</span></p></div><div class="shape text-shape" data-shape-text="10-6" style="left:115.206px;top:496.800px;width:326.417px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p10-s6-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#B95538">做什么</span></p></div><div class="shape text-shape" data-shape-text="10-7" style="left:115.206px;top:745.200px;width:326.417px;height:118.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p10-s7-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#B95538">要什么</span></p></div><div class="shape site-links align-right" style="left:1390px;top:113px;width:410px;height:56px"><a class="site-link" data-site-link="bytedance" href="https://jobs.bytedance.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p10-bytedance" contenteditable="false">字节跳动招聘</span><span aria-hidden="true">↗</span></a></div></section><section class="slide" data-slide="11" data-title="WonderCV" aria-label="第11页：WonderCV" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第11页原始配图1" src="assets/c6fc2ce2509decf9.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape image-shape linked-image" data-zoom style="left:134.007px;top:433.000px;width:749.039px;height:236.000px"><a class="image-link" data-site-link="wondercv" href="https://www.wondercv.com/" target="_blank" rel="noopener noreferrer" aria-label="打开WonderCV官网，新标签页"><img alt="第11页原始配图2" src="assets/def2933d3355fe75.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></a><button class="picture-zoom" title="放大截图" aria-label="放大第11页截图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button></div><div class="shape image-shape linked-image" data-zoom style="left:1094.057px;top:509.000px;width:710.037px;height:83.000px"><a class="image-link" data-site-link="wondercv" href="https://www.wondercv.com/" target="_blank" rel="noopener noreferrer" aria-label="打开WonderCV官网，新标签页"><img alt="第11页原始配图3" src="assets/cc26f93139dd05c9.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></a><button class="picture-zoom" title="放大截图" aria-label="放大第11页截图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5"/></svg></button></div><div class="shape text-shape" data-shape-text="11-3" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><a class="title-site-link" data-site-link="wondercv" href="https://www.wondercv.com/" target="_blank" rel="noopener noreferrer" title="打开WonderCV官网"><span data-editable="p11-s3-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">Wonde</span><span data-editable="p11-s3-p0-r1" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">rCV</span></a></p></div><div class="shape text-shape" data-shape-text="11-4" style="left:134.407px;top:270.000px;width:748.839px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:58.000px"><span data-editable="p11-s4-p0-r0" contenteditable="false" style="font-size:48.000px;font-weight:400;color:#B95538">编辑</span></p></div><div class="shape text-shape" data-shape-text="11-5" style="left:1094.457px;top:270.000px;width:710.437px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:58.000px"><span data-editable="p11-s5-p0-r0" contenteditable="false" style="font-size:48.000px;font-weight:400;color:#B95538">预览</span></p></div><div class="shape site-links align-right" style="left:1390px;top:113px;width:410px;height:56px"><a class="site-link" data-site-link="wondercv" href="https://www.wondercv.com/" target="_blank" rel="noopener noreferrer"><span data-editable="site-p11-wondercv" contenteditable="false">WonderCV</span><span aria-hidden="true">↗</span></a></div></section><section class="slide" data-slide="12" data-title="简历先让人看见相关证据" aria-label="第12页：简历先让人看见相关证据" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第12页原始配图1" src="assets/38751891ece3986c.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><button class="shape image-shape zoomable" data-zoom aria-label="放大第12页配图2" style="left:653.034px;top:467.000px;width:1056.055px;height:69.000px"><img alt="第12页原始配图2" src="assets/963622d47d653893.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><button class="shape image-shape zoomable" data-zoom aria-label="放大第12页配图3" style="left:653.034px;top:651.000px;width:1056.055px;height:37.000px"><img alt="第12页原始配图3" src="assets/cdca9a1e6f386af9.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><div class="shape text-shape" data-shape-text="12-3" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p12-s3-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">简历先让人看见相关证据</span></p></div><div class="shape text-shape" data-shape-text="12-4" style="left:134.407px;top:280.800px;width:364.819px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p12-s4-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#B95538">联系</span></p></div><div class="shape text-shape" data-shape-text="12-5" style="left:134.407px;top:426.600px;width:364.819px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p12-s5-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#B95538">教育</span></p></div><div class="shape text-shape" data-shape-text="12-6" style="left:134.407px;top:583.200px;width:364.819px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p12-s6-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#B95538">经历</span></p></div><div class="shape text-shape" data-shape-text="12-7" style="left:76.804px;top:799.200px;width:480.025px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:50.000px"><span data-editable="p12-s7-p0-r0" contenteditable="false" style="font-size:42.000px;font-weight:400;color:#B95538">作品／技能</span></p></div><div class="shape text-shape" data-shape-text="12-8" style="left:652.834px;top:291.600px;width:1056.055px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:44.000px"><span data-editable="p12-s8-p0-r0" contenteditable="false" style="font-size:37.000px;font-weight:400;color:#282420">电话／邮箱／网站／GitHub</span></p></div><div class="shape text-shape" data-shape-text="12-9" style="left:652.834px;top:810.000px;width:1056.055px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:44.000px"><span data-editable="p12-s9-p0-r0" contenteditable="false" style="font-size:37.000px;font-weight:400;color:#282420">真实项目、实习、作品</span></p></div></section><section class="slide" data-slide="13" data-title="STAR原则" aria-label="第13页：STAR原则" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第13页原始配图1" src="assets/81eed0ae10e42d90.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><button class="shape image-shape zoomable" data-zoom aria-label="放大第13页配图2" style="left:309.016px;top:464.000px;width:342.018px;height:432.000px"><img alt="第13页原始配图2" src="assets/03a706fdc5df2e53.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><button class="shape image-shape zoomable" data-zoom aria-label="放大第13页配图3" style="left:1171.061px;top:464.000px;width:577.030px;height:432.000px"><img alt="第13页原始配图3" src="assets/a82195c7b26e9aae.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button><div class="shape text-shape" data-shape-text="13-3" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p13-s3-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">STAR</span><span data-editable="p13-s3-p0-r1" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">原则</span></p></div><div class="shape text-shape" data-shape-text="13-4" style="left:115.206px;top:270.000px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:50.000px"><span data-editable="p13-s4-p0-r0" contenteditable="false" style="font-size:42.000px;font-weight:400;color:#282420">S背景</span></p></div><div class="shape text-shape" data-shape-text="13-5" style="left:537.628px;top:270.000px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:50.000px"><span data-editable="p13-s5-p0-r0" contenteditable="false" style="font-size:42.000px;font-weight:400;color:#282420">T任务</span></p></div><div class="shape text-shape" data-shape-text="13-6" style="left:960.050px;top:270.000px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:50.000px"><span data-editable="p13-s6-p0-r0" contenteditable="false" style="font-size:42.000px;font-weight:400;color:#282420">A行动</span></p></div><div class="shape text-shape" data-shape-text="13-7" style="left:1382.472px;top:270.000px;width:422.422px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:50.000px"><span data-editable="p13-s7-p0-r0" contenteditable="false" style="font-size:42.000px;font-weight:400;color:#282420">R结果</span></p></div></section><section class="slide" data-slide="14" data-title="实习经历" aria-label="第14页：实习经历" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第14页原始配图1" src="assets/579183fb8597f637.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="14-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p14-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">实习</span><span data-editable="p14-s1-p0-r1" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">经历</span></p></div><div class="shape text-shape" data-shape-text="14-2" style="left:211.211px;top:237.600px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p14-s2-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">助教</span></p></div><div class="shape text-shape" data-shape-text="14-3" style="left:1171.261px;top:237.600px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p14-s3-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">转化</span></p></div><div class="shape text-shape" data-shape-text="14-4" style="left:211.211px;top:637.200px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p14-s4-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">调研</span></p></div><div class="shape text-shape" data-shape-text="14-5" style="left:1171.261px;top:637.200px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:60.000px"><span data-editable="p14-s5-p0-r0" contenteditable="false" style="font-size:50.000px;font-weight:400;color:#282420">市场</span></p></div></section><section class="slide" data-slide="15" data-title="接任务，先把四件事问清" aria-label="第15页：接任务，先把四件事问清" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第15页原始配图1" src="assets/3e923439b431b831.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="15-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p15-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">接任务，先把四件事问清</span></p></div><div class="shape text-shape" data-shape-text="15-2" style="left:268.814px;top:226.800px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:53.000px"><span data-editable="p15-s2-p0-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#B95538">做什么</span></p></div><div class="shape text-shape" data-shape-text="15-3" style="left:748.839px;top:226.800px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:53.000px"><span data-editable="p15-s3-p0-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#B95538">何时交</span></p></div><div class="shape text-shape" data-shape-text="15-4" style="left:1228.864px;top:226.800px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:53.000px"><span data-editable="p15-s4-p0-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#B95538">交什么</span></p></div><div class="shape text-shape" data-shape-text="15-5" style="left:76.804px;top:810.000px;width:364.819px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:53.000px"><span data-editable="p15-s5-p0-r0" contenteditable="false" style="font-size:44.000px;font-weight:400;color:#B95538">问谁</span></p></div></section><section class="slide" data-slide="16" data-title="六点没做完，先分清优先级" aria-label="第16页：六点没做完，先分清优先级" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第16页原始配图1" src="assets/5b98515baf061081.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="16-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p16-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">六点没做完，先分清优先级</span></p></div><div class="shape text-shape" data-shape-text="16-2" style="left:160.008px;top:348.300px;width:672.035px;height:151.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:115.000px"><span data-editable="p16-s2-p0-r0" contenteditable="false" style="font-size:96.000px;font-weight:400;color:#B95538">18:00</span></p></div><div class="shape text-shape" data-shape-text="16-3" style="left:115.206px;top:658.800px;width:729.638px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p16-s3-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">剩余任务</span></p></div><div class="shape text-shape" data-shape-text="16-4" style="left:1152.060px;top:313.200px;width:652.834px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p16-s4-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">今天必须</span></p></div><div class="shape text-shape" data-shape-text="16-5" style="left:1152.060px;top:432.000px;width:652.834px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:42.000px"><span data-editable="p16-s5-p0-r0" contenteditable="false" style="font-size:35.000px;font-weight:400;color:#B95538">先做</span></p></div><div class="shape text-shape" data-shape-text="16-6" style="left:1152.060px;top:669.600px;width:652.834px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p16-s6-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">周期内</span></p></div><div class="shape text-shape" data-shape-text="16-7" style="left:1152.060px;top:799.200px;width:652.834px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:42.000px"><span data-editable="p16-s7-p0-r0" contenteditable="false" style="font-size:35.000px;font-weight:400;color:#B95538">说好何时交</span></p></div></section><section class="slide" data-slide="17" data-title="带着方案，找能决定的人确认" aria-label="第17页：带着方案，找能决定的人确认" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第17页原始配图1" src="assets/6de15a194b24030c.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="17-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p17-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">带着方案，找能决定的人确认</span></p></div><div class="shape text-shape" data-shape-text="17-2" style="left:134.407px;top:334.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p17-s2-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">对方</span></p></div><div class="shape text-shape" data-shape-text="17-3" style="left:768.040px;top:334.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:61.000px"><span data-editable="p17-s3-p0-r0" contenteditable="false" style="font-size:51.000px;font-weight:400;color:#B95538">我</span></p></div><div class="shape text-shape" data-shape-text="17-4" style="left:1401.673px;top:334.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p17-s4-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">负责人</span></p></div><div class="shape text-shape" data-shape-text="17-5" style="left:134.407px;top:712.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p17-s5-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">对方</span></p></div><div class="shape text-shape" data-shape-text="17-6" style="left:768.040px;top:712.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:61.000px"><span data-editable="p17-s6-p0-r0" contenteditable="false" style="font-size:51.000px;font-weight:400;color:#B95538">我</span></p></div><div class="shape text-shape" data-shape-text="17-7" style="left:1401.673px;top:712.800px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p17-s7-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">负责人</span></p></div><div class="shape text-shape" data-shape-text="17-8" style="left:518.427px;top:259.200px;width:288.015px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:38.000px"><span data-editable="p17-s8-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">提问</span></p></div><div class="shape text-shape" data-shape-text="17-9" style="left:1132.859px;top:259.200px;width:364.819px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:38.000px"><span data-editable="p17-s9-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">带方案确认</span></p></div><div class="shape text-shape" data-shape-text="17-10" style="left:480.025px;top:853.200px;width:384.020px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:38.000px"><span data-editable="p17-s10-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">确认后回复</span></p></div><div class="shape text-shape" data-shape-text="17-11" style="left:1190.462px;top:853.200px;width:307.216px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:38.000px"><span data-editable="p17-s11-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420">确认</span></p></div><div class="shape text-shape" data-shape-text="17-12" style="left:134.407px;top:966.600px;width:1651.286px;height:43.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:30.000px"><span data-editable="p17-s12-p0-r0" contenteditable="false" style="font-size:25.000px;font-weight:400;color:#776F66">先约好回复时间</span></p></div></section><section class="slide" data-slide="18" data-title="AI做完之后，还得自己看一遍" aria-label="第18页：AI做完之后，还得自己看一遍" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第18页原始配图1" src="assets/7545cba4b97b7555.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="18-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p18-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">AI做完之后，还得自己看一遍</span></p></div><div class="shape text-shape" data-shape-text="18-2" style="left:115.206px;top:270.000px;width:499.226px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p18-s2-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">AI处理</span></p></div><div class="shape text-shape" data-shape-text="18-3" style="left:710.437px;top:270.000px;width:499.226px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p18-s3-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#B95538">自己审查</span></p></div><div class="shape text-shape" data-shape-text="18-4" style="left:1305.668px;top:270.000px;width:499.226px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:54.000px"><span data-editable="p18-s4-p0-r0" contenteditable="false" style="font-size:45.000px;font-weight:400;color:#282420">再交付</span></p></div></section><section class="slide" data-slide="19" data-title="中途同步，交付分清三类" aria-label="第19页：中途同步，交付分清三类" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第19页原始配图1" src="assets/d47df7c04340f63d.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="19-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p19-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">中途同步，交付分清三类</span></p></div><div class="shape text-shape" data-shape-text="19-2" style="left:134.407px;top:302.400px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p19-s2-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">开工</span></p></div><div class="shape text-shape" data-shape-text="19-3" style="left:710.437px;top:302.400px;width:499.226px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p19-s3-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#B95538">中途同步</span></p></div><div class="shape text-shape" data-shape-text="19-4" style="left:1401.673px;top:302.400px;width:384.020px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p19-s4-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">交付</span></p></div><div class="shape text-shape" data-shape-text="19-5" style="left:115.206px;top:745.200px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p19-s5-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">已完成</span></p></div><div class="shape text-shape" data-shape-text="19-6" style="left:691.236px;top:745.200px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p19-s6-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">待确认</span></p></div><div class="shape text-shape" data-shape-text="19-7" style="left:1267.266px;top:745.200px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p19-s7-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">有卡点</span></p></div></section><section class="slide" data-slide="20" data-title="沟通清楚，关键事项留文字" aria-label="第20页：沟通清楚，关键事项留文字" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第20页原始配图1" src="assets/6853c6c02883a503.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="20-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p20-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">沟通清楚，关键事项留文字</span></p></div><div class="shape text-shape" data-shape-text="20-2" style="left:115.206px;top:291.600px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p20-s2-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">想清楚</span></p></div><div class="shape text-shape" data-shape-text="20-3" style="left:691.236px;top:291.600px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p20-s3-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">说具体</span></p></div><div class="shape text-shape" data-shape-text="20-4" style="left:1267.266px;top:291.600px;width:537.628px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:55.000px"><span data-editable="p20-s4-p0-r0" contenteditable="false" style="font-size:46.000px;font-weight:400;color:#282420">留文字</span></p></div><div class="shape text-shape" data-shape-text="20-5" style="left:672.035px;top:874.800px;width:576.030px;height:64.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:41.000px"><span data-editable="p20-s5-p0-r0" contenteditable="false" style="font-size:34.000px;font-weight:400;color:#B95538">AI帮忙措辞</span></p></div></section><section class="slide" data-slide="21" data-title="多沟通" aria-label="第21页：多沟通" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第21页原始配图1" src="assets/976378f4febe3738.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="21-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p21-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">多沟通</span></p></div><div class="shape text-shape" data-shape-text="21-2" style="left:134.407px;top:216.000px;width:1056.055px;height:118.800px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:94.000px"><span data-editable="p21-s2-p0-r0" contenteditable="false" style="font-size:32.000px;font-weight:400;color:#282420"></span></p></div><div class="shape text-shape" data-shape-text="21-3" style="left:134.407px;top:966.600px;width:1651.286px;height:43.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:30.000px"><span data-editable="p21-s3-p0-r0" contenteditable="false" style="font-size:25.000px;font-weight:400;color:#776F66">情境示意</span></p></div></section><section class="slide" data-slide="22" data-title="解决过的问题，要留下方法" aria-label="第22页：解决过的问题，要留下方法" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第22页原始配图1" src="assets/ded434d617ad79ea.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="22-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p22-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">解决过的问题，要留下方法</span></p></div><div class="shape text-shape" data-shape-text="22-2" style="left:115.206px;top:820.800px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p22-s2-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#282420">问题</span></p></div><div class="shape text-shape" data-shape-text="22-3" style="left:691.236px;top:820.800px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p22-s3-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#282420">方法</span></p></div><div class="shape text-shape" data-shape-text="22-4" style="left:1267.266px;top:820.800px;width:537.628px;height:97.200px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:59.000px"><span data-editable="p22-s4-p0-r0" contenteditable="false" style="font-size:49.000px;font-weight:400;color:#B95538">下次复用</span></p></div></section><section class="slide" data-slide="23" data-title="主业之外，给自己留点时间" aria-label="第23页：主业之外，给自己留点时间" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第23页原始配图1" src="assets/e7a05cb0bffae456.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="23-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p23-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">主业之外，给自己留点时间</span></p></div><div class="shape text-shape" data-shape-text="23-2" style="left:153.608px;top:270.000px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:48.000px"><span data-editable="p23-s2-p0-r0" contenteditable="false" style="font-size:40.000px;font-weight:400;color:#282420">摄影</span></p></div><div class="shape text-shape" data-shape-text="23-3" style="left:748.839px;top:270.000px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:48.000px"><span data-editable="p23-s3-p0-r0" contenteditable="false" style="font-size:40.000px;font-weight:400;color:#282420">硬件</span></p></div><div class="shape text-shape" data-shape-text="23-4" style="left:1344.070px;top:270.000px;width:422.422px;height:75.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:48.000px"><span data-editable="p23-s4-p0-r0" contenteditable="false" style="font-size:40.000px;font-weight:400;color:#282420">网站</span></p></div></section><section class="slide" data-slide="24" data-title="起步时，很多问题都可以开口问" aria-label="第24页：起步时，很多问题都可以开口问" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第24页原始配图1" src="assets/b86e72db4c513fd1.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><div class="shape text-shape" data-shape-text="24-1" style="left:134.407px;top:59.400px;width:1651.286px;height:129.600px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:left;line-height:86.000px"><span data-editable="p24-s1-p0-r0" contenteditable="false" style="font-size:72.000px;font-weight:400;color:#282420">起步时，很多问题都可以开口问</span></p></div><div class="shape text-shape" data-shape-text="24-2" style="left:134.407px;top:248.400px;width:652.834px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p24-s2-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">不会／做错</span></p></div><div class="shape text-shape" data-shape-text="24-3" style="left:1132.859px;top:248.400px;width:652.834px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p24-s3-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">社团／比赛</span></p></div><div class="shape text-shape" data-shape-text="24-4" style="left:134.407px;top:702.000px;width:652.834px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:52.000px"><span data-editable="p24-s4-p0-r0" contenteditable="false" style="font-size:43.000px;font-weight:400;color:#282420">英语／外企</span></p></div><div class="shape text-shape" data-shape-text="24-5" style="left:1094.457px;top:702.000px;width:729.638px;height:86.400px;padding:0.000px 0.000px 0.000px 0.000px;justify-content:flex-end"><p style="text-align:center;line-height:49.000px"><span data-editable="p24-s5-p0-r0" contenteditable="false" style="font-size:41.000px;font-weight:400;color:#282420">内向／工作安排</span></p></div></section><section class="slide" data-slide="25" data-title="交流与联系" aria-label="第25页：交流与联系" aria-hidden="true" inert><div class="shape image-shape" style="left:0.000px;top:0.000px;width:1920.100px;height:1080.000px" aria-hidden="true"><img alt="第25页原始配图1" src="assets/e8082210913d6960.jpg" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></div><button class="shape image-shape zoomable" data-zoom aria-label="放大第25页配图2" style="left:174.309px;top:182.400px;width:565.429px;height:684.000px"><img alt="第25页原始配图2" src="assets/5e565806254fe979.png" style="position:absolute;width:100.0000000%;height:100.0000000%;left:-0.0000000%;top:-0.0000000%" draggable="false"></button></section></div></div></div>
@@ -84,7 +154,7 @@ body.presentation-mode .frame{border-radius:0;box-shadow:none}
 <div class="present-hint">方向键翻页 · 按Esc退出放映</div><div id="page-announcement" class="sr-only" aria-live="polite"></div><div id="toast" class="toast" role="status" hidden></div>
 <div id="overview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="overview-title" hidden><div class="modal-panel"><div class="panel-head"><h2 id="overview-title">分享目录<small style="color:#a6a6a2;font-size:14px;margin-left:12px">25页</small></h2><button data-close aria-label="关闭目录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><input id="overview-search" class="overview-search" type="search" placeholder="找一页内容…" aria-label="搜索页面"><div class="overview-list"><button data-overview-index="0"><span class="index">01</span><span class="label">实习分享<small>开场</small></span></button><button data-overview-index="1"><span class="index">02</span><span class="label">介绍<small>开场</small></span></button><button data-overview-index="2"><span class="index">03</span><span class="label">目录<small>开场</small></span></button><button data-overview-index="3"><span class="index">04</span><span class="label">实习目的<small>目的</small></span></button><button data-overview-index="4"><span class="index">05</span><span class="label">先看自己能拿出多长时间<small>目的</small></span></button><button data-overview-index="5"><span class="index">06</span><span class="label">第一段，可以从相关岗位起步<small>机会</small></span></button><button data-overview-index="6"><span class="index">07</span><span class="label">投递渠道<small>机会</small></span></button><button data-overview-index="7"><span class="index">08</span><span class="label">侧重点<small>机会</small></span></button><button data-overview-index="8"><span class="index">09</span><span class="label">Resume Coach - 简历分析与修改<small>简历</small></span></button><button data-overview-index="9"><span class="index">10</span><span class="label">JD<small>简历</small></span></button><button data-overview-index="10"><span class="index">11</span><span class="label">WonderCV<small>简历</small></span></button><button data-overview-index="11"><span class="index">12</span><span class="label">简历先让人看见相关证据<small>简历</small></span></button><button data-overview-index="12"><span class="index">13</span><span class="label">STAR原则<small>简历</small></span></button><button data-overview-index="13"><span class="index">14</span><span class="label">实习经历<small>工作</small></span></button><button data-overview-index="14"><span class="index">15</span><span class="label">接任务，先把四件事问清<small>职场</small></span></button><button data-overview-index="15"><span class="index">16</span><span class="label">六点没做完，先分清优先级<small>职场</small></span></button><button data-overview-index="16"><span class="index">17</span><span class="label">带着方案，找能决定的人确认<small>职场</small></span></button><button data-overview-index="17"><span class="index">18</span><span class="label">AI做完之后，还得自己看一遍<small>职场</small></span></button><button data-overview-index="18"><span class="index">19</span><span class="label">中途同步，交付分清三类<small>职场</small></span></button><button data-overview-index="19"><span class="index">20</span><span class="label">沟通清楚，关键事项留文字<small>职场</small></span></button><button data-overview-index="20"><span class="index">21</span><span class="label">多沟通<small>职场</small></span></button><button data-overview-index="21"><span class="index">22</span><span class="label">解决过的问题，要留下方法<small>职场</small></span></button><button data-overview-index="22"><span class="index">23</span><span class="label">主业之外，给自己留点时间<small>职场</small></span></button><button data-overview-index="23"><span class="index">24</span><span class="label">起步时，很多问题都可以开口问<small>职场</small></span></button><button data-overview-index="24"><span class="index">25</span><span class="label">交流与联系<small>交流</small></span></button><p class="no-result" id="no-result" hidden>没有找到这页，换个关键词试试。</p></div></div></div>
 <div id="image-modal" class="modal image-modal" role="dialog" aria-modal="true" aria-label="原图预览" hidden><div class="image-dialog"><div id="zoom-viewport" class="zoom-viewport"><div class="zoom-surface"><img id="zoom-image" alt="" draggable="false"></div></div><div class="image-tools" aria-label="原图工具"><div id="image-gallery" class="image-gallery"><button id="gallery-prev" aria-label="上一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><span id="gallery-count">1 / 1</span><button id="gallery-next" aria-label="下一张图片"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button></div><button id="zoom-out" aria-label="缩小图片">−</button><span id="zoom-level">适应</span><button id="zoom-in" aria-label="放大图片">＋</button><button id="zoom-fit" aria-label="图片适应窗口">适应</button></div><button class="close-image" data-close aria-label="关闭原图"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button><span class="image-hint">同页配图可左右切换 · 放大后可拖动 · 按Esc返回</span></div></div>
-<div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden><div class="modal-panel help-panel"><div class="panel-head"><h2 id="help-title">轻松开讲</h2><button data-close aria-label="关闭操作说明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="help-rows"><div><span>翻页</span><kbd>← → / 空格</kbd></div><div><span>跳到开场／结束</span><kbd>Home / End</kbd></div><div><span>全屏放映</span><kbd>F</kbd></div><div><span>目录／讲稿／编辑</span><kbd>O / N / E</kbd></div><div><span>返回演示／退出全屏</span><kbd>Esc</kbd></div><p>点击配图可查看原图。点击“编辑文字”后直接修改页面文字或讲稿，再点“保存HTML”下载修改后的文件。手机上可左右滑动翻页。视频点击播放即可。</p></div></div></div>
+<div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden><div class="modal-panel help-panel"><div class="panel-head"><h2 id="help-title">轻松开讲</h2><button data-close aria-label="关闭操作说明"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="help-rows"><div><span>翻页</span><kbd>← → / 空格</kbd></div><div><span>跳到开场／结束</span><kbd>Home / End</kbd></div><div><span>全屏放映</span><kbd>F</kbd></div><div><span>目录／讲稿／编辑</span><kbd>O / N / E</kbd></div><div><span>返回演示／退出全屏</span><kbd>Esc</kbd></div><p>点“编辑页面”修改文字或讲稿。点“插入图片”选取本地图片，拖动图片可移动，拖动角上的圆点可等比缩放。点“保存HTML”下载含图片的演示文件。</p></div></div></div>
 <div hidden><div class="note-source" id="note-1" hidden></div><div class="note-source" id="note-2" hidden></div><div class="note-source" id="note-3" hidden>今天从这五个问题聊起（0:30—1:00）
 今天大概沿着这条路走：为什么实习，机会从哪里来，简历怎么改，实习生进去以后到底做什么，还有跟同事相处、接任务时的一些体会。
 
@@ -242,7 +312,309 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
 [预留约3分钟现场交流。可以从找岗位、改简历、第一次上班的沟通与相处三个方向接问题。已有话题尽量结合本人经历回答；没有经历过的就直说，不把一家公司的做法当成所有公司的规则。若现场暂时没人发问，可邀请一位同学说说今天最想进一步了解的部分，停顿等待，不额外增加一页Q&amp;A。]
 
 资料出处：36（对应逐页大纲）</div></div>
-<script>(() => {
+<script>// Inserted pictures live in the slide DOM so a saved HTML also works offline.
+// The browser keeps original image bytes separate from frequently changed positions.
+window.createSlideImageEditor = function (options) {
+  'use strict';
+  const { canvas, slides, storeKey, getSlide, announce, onSelectionChange } = options;
+  const scope = storeKey + '/' + (document.body.dataset.imageRevision || 'original');
+  const slideByPage = new Map(slides.map(slide => [slide.dataset.slide, slide]));
+  const boxes = new Map();
+  const embedded = new Set();
+  const uncommitted = new Set();
+  const pending = new Set();
+  let db, selected, gesture, editing = false, hydrated = false, storageWarning = false;
+
+  function uniqueId() {
+    return Array.from(crypto.getRandomValues(new Uint32Array(4)), n => n.toString(16).padStart(8, '0')).join('');
+  }
+  function geometry(box) {
+    const { left, top, width, height } = box.style;
+    return { x: parseFloat(left), y: parseFloat(top), w: parseFloat(width), h: parseFloat(height) };
+  }
+  function place(box, { x, y, w, h }) {
+    Object.assign(box.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+  }
+  function register(box) {
+    boxes.set(box.dataset.userImage, box);
+    box.tabIndex = editing ? 0 : -1;
+    for (const corner of ['nw', 'ne', 'sw', 'se']) {
+      const handle = document.createElement('span');
+      handle.className = 'image-handle';
+      handle.dataset.corner = corner;
+      handle.setAttribute('aria-hidden', 'true');
+      box.append(handle);
+    }
+  }
+  function makeBox(slide, id, name, src, rect) {
+    const box = document.createElement('div');
+    box.className = 'shape user-image';
+    box.dataset.userImage = id;
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', name);
+    const img = document.createElement('img');
+    img.alt = name;
+    img.draggable = false;
+    img.src = src;
+    box.append(img);
+    place(box, rect);
+    register(box);
+    slide.append(box);
+    return box;
+  }
+  for (const box of canvas.querySelectorAll('.user-image[data-user-image]')) {
+    embedded.add(box.dataset.userImage);
+    register(box);
+  }
+
+  function openDatabase() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('slide-image-editor-v1', 1);
+      request.onupgradeneeded = () => {
+        for (const name of ['layouts', 'pictures']) {
+          const store = request.result.createObjectStore(name, { keyPath: ['scope', 'id'] });
+          store.createIndex('scope', 'scope');
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error('图片存储被占用'));
+    });
+  }
+  async function restore() {
+    const database = await openDatabase();
+    const tx = database.transaction(['layouts', 'pictures'], 'readonly');
+    function rows(name) {
+      return new Promise((resolve, reject) => {
+        const request = tx.objectStore(name).index('scope').getAll(scope);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+    const [layouts, pictures] = await Promise.all([rows('layouts'), rows('pictures')]);
+    const sources = new Map(pictures.map(picture => [picture.id, picture]));
+    // The index groups by scope and ID, so restore insertion order explicitly.
+    layouts.sort((a, b) => a.order - b.order);
+    for (const item of layouts) {
+      const box = boxes.get(item.id);
+      if (item.removed) {
+        box?.remove();
+        boxes.delete(item.id);
+        continue;
+      }
+      const slide = slideByPage.get(item.page);
+      if (!slide || ![item.x, item.y, item.w, item.h].every(Number.isFinite) || item.w <= 0 || item.h <= 0) continue;
+      if (box) {
+        place(box, item);
+      } else if (sources.has(item.id)) {
+        const picture = sources.get(item.id);
+        const added = makeBox(slide, item.id, picture.name, picture.src, item);
+        added.dataset.imageOrder = item.order;
+      }
+    }
+    db = database;
+    database.onversionchange = () => { database.close(); db = null; };
+  }
+  function warnStorage() {
+    if (storageWarning) return;
+    storageWarning = true;
+    announce('浏览器未能保存这次图片修改。请点“保存HTML”保留当前版本。');
+  }
+  const ready = restore().catch(() => {
+    // Some local-file and private browsing contexts disable IndexedDB.
+    // A successful insertion still works, and export always reads the DOM.
+    db = null;
+  }).finally(() => { hydrated = true; });
+
+  function persist(box, removed = false) {
+    const id = box.dataset.userImage;
+    if (!db) { warnStorage(); return; }
+    try {
+      const saveSource = !removed && uncommitted.has(id);
+      const tx = db.transaction(saveSource || removed ? ['layouts', 'pictures'] : ['layouts'], 'readwrite');
+      tx.onabort = warnStorage;
+      tx.oncomplete = () => {
+        if (saveSource || removed) uncommitted.delete(id);
+        storageWarning = false;
+      };
+      const layouts = tx.objectStore('layouts');
+      if (removed) {
+        if (embedded.has(id)) layouts.put({ scope, id, removed: true });
+        else layouts.delete([scope, id]);
+        tx.objectStore('pictures').delete([scope, id]);
+      } else {
+        layouts.put({ scope, id, page: box.parentElement.dataset.slide,
+          order: Number(box.dataset.imageOrder) || 0, ...geometry(box) });
+        if (saveSource) {
+          const img = box.querySelector('img');
+          tx.objectStore('pictures').put({ scope, id, name: img.alt, src: img.getAttribute('src') });
+        }
+      }
+    } catch { warnStorage(); }
+  }
+
+  function select(box) {
+    if (selected === box) return;
+    selected?.classList.remove('is-selected');
+    selected = box;
+    selected?.classList.add('is-selected');
+    onSelectionChange(Boolean(selected));
+  }
+  function endGesture(cancelled = false) {
+    if (!gesture) return;
+    const { box, pointer, original, moved } = gesture;
+    gesture = null;
+    if (box.hasPointerCapture(pointer)) box.releasePointerCapture(pointer);
+    if (!moved) return;
+    if (cancelled) place(box, original);
+    else persist(box);
+  }
+  function clearSelection() {
+    endGesture();
+    select(null);
+  }
+  function setEditing(value) {
+    editing = value;
+    if (!editing) clearSelection();
+    for (const box of boxes.values()) box.tabIndex = editing ? 0 : -1;
+  }
+  function removeSelected() {
+    if (!editing || !selected || selected.parentElement !== getSlide()) return;
+    const box = selected;
+    clearSelection();
+    boxes.delete(box.dataset.userImage);
+    announce('已删除图片。');
+    persist(box, true);
+    box.remove();
+  }
+
+  async function readPicture(file) {
+    const bytes = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const signature = String.fromCharCode(...bytes);
+    let mime;
+    if (signature.startsWith('\x89PNG\r\n\x1a\n')) mime = 'image/png';
+    else if (signature.startsWith('\xff\xd8\xff')) mime = 'image/jpeg';
+    else if (signature.startsWith('GIF87a') || signature.startsWith('GIF89a')) mime = 'image/gif';
+    else if (signature.startsWith('RIFF') && signature.slice(8) === 'WEBP') mime = 'image/webp';
+    else throw new Error('请选择PNG、JPEG、WebP或GIF图片。');
+    const data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('无法读取这张图片，请重新选择。'));
+      reader.readAsDataURL(file.slice(0, file.size, mime));
+    });
+    const preview = new Image();
+    await new Promise((resolve, reject) => {
+      preview.onload = resolve;
+      preview.onerror = () => reject(new Error('无法打开这张图片，请检查图片文件。'));
+      preview.src = data;
+    });
+    return { data, width: preview.naturalWidth, height: preview.naturalHeight };
+  }
+  async function add(file, slide) {
+    await ready;
+    const picture = await readPicture(file);
+    const ratio = picture.width / picture.height;
+    const boardW = slide.clientWidth, boardH = slide.clientHeight;
+    const w = Math.min(Math.max(picture.width, Math.min(120, 120 * ratio)), boardW * 0.5, boardH * 0.58 * ratio);
+    const h = w / ratio;
+    const box = makeBox(slide, uniqueId(), file.name || '插入的图片', picture.data,
+      { x: (boardW - w) / 2, y: (boardH - h) / 2, w, h });
+    box.dataset.imageOrder = String(Date.now());
+    uncommitted.add(box.dataset.userImage);
+    if (editing && getSlide() === slide) {
+      select(box);
+      box.focus({ preventScroll: true });
+    }
+    announce('图片已插入第' + slide.dataset.slide + '页。拖动图片可移动，拖动四角可缩放。');
+    persist(box);
+  }
+  function insert(file, slide = getSlide()) {
+    if (!file || !slides.includes(slide)) return Promise.resolve();
+    const task = add(file, slide).catch(error => announce(error.message || '图片插入失败，请重新选择。'));
+    pending.add(task);
+    task.finally(() => pending.delete(task));
+    return task;
+  }
+  async function settled() {
+    await ready;
+    while (pending.size) await Promise.all([...pending]);
+  }
+
+  canvas.addEventListener('focusin', event => {
+    if (editing && hydrated) select(event.target.closest('.user-image'));
+  });
+  canvas.addEventListener('pointerdown', event => {
+    if (!editing || !hydrated || !event.isPrimary || event.button !== 0 || gesture) return;
+    const box = event.target.closest('.user-image');
+    select(box);
+    if (!box || box.parentElement !== getSlide()) return;
+    const slide = box.parentElement;
+    const rect = slide.getBoundingClientRect();
+    const width = slide.clientWidth, height = slide.clientHeight;
+    if (!rect.width || !rect.height) return;
+    gesture = { box, pointer: event.pointerId, x: event.clientX, y: event.clientY,
+      scaleX: width / rect.width, scaleY: height / rect.height, width, height,
+      original: geometry(box), corner: event.target.closest('.image-handle')?.dataset.corner, moved: false };
+    box.focus({ preventScroll: true });
+    box.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  const clamp = (n, max) => Math.max(0, Math.min(max, n));
+  canvas.addEventListener('pointermove', event => {
+    if (!gesture || event.pointerId !== gesture.pointer) return;
+    const { box, corner, original: before, width, height } = gesture;
+    const dx = (event.clientX - gesture.x) * gesture.scaleX;
+    const dy = (event.clientY - gesture.y) * gesture.scaleY;
+    if (!gesture.moved && !dx && !dy) return;
+    gesture.moved = true;
+    if (corner) {
+      const west = corner.endsWith('w'), north = corner.startsWith('n');
+      const ratio = before.w / before.h;
+      const anchorX = west ? before.x + before.w : before.x;
+      const anchorY = north ? before.y + before.h : before.y;
+      const maxW = Math.min(west ? anchorX : width - anchorX, (north ? anchorY : height - anchorY) * ratio);
+      const minW = Math.min(36, 36 * ratio, maxW);
+      const change = Math.abs(dx) >= Math.abs(dy * ratio) ? (west ? -dx : dx) : (north ? -dy : dy) * ratio;
+      const w = Math.max(minW, Math.min(maxW, before.w + change)), h = w / ratio;
+      place(box, { x: west ? anchorX - w : anchorX, y: north ? anchorY - h : anchorY, w, h });
+    } else {
+      place(box, { ...before, x: clamp(before.x + dx, width - before.w), y: clamp(before.y + dy, height - before.h) });
+    }
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+    canvas.addEventListener(type, event => {
+      if (gesture && event.pointerId === gesture.pointer) endGesture(type === 'pointercancel');
+    });
+  }
+  canvas.addEventListener('keydown', event => {
+    if (!editing || !selected || !selected.contains(event.target) || event.ctrlKey || event.metaKey || event.altKey) return;
+    const offsets = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    if (event.key === 'Delete' || event.key === 'Backspace') removeSelected();
+    else if (event.key === 'Escape') clearSelection();
+    else if (Object.hasOwn(offsets, event.key)) {
+      const [dx, dy] = offsets[event.key], step = event.shiftKey ? 10 : 1;
+      const slide = selected.parentElement, rect = geometry(selected);
+      place(selected, { ...rect, x: clamp(rect.x + dx * step, slide.clientWidth - rect.w),
+        y: clamp(rect.y + dy * step, slide.clientHeight - rect.h) });
+      persist(selected);
+    } else return;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  function prepareExport(clone) {
+    clone.querySelector('body').dataset.imageRevision = uniqueId();
+    for (const box of clone.querySelectorAll('.user-image')) {
+      box.classList.remove('is-selected');
+      box.removeAttribute('tabindex');
+      box.querySelectorAll('.image-handle').forEach(handle => handle.remove());
+    }
+  }
+  return { ready, settled, setEditing, clearSelection, insert, removeSelected, prepareExport };
+};
+
+(() => {
   'use strict';
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -261,6 +633,13 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     const el = $('#toast'); el.textContent = message; el.hidden = false;
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, 2800);
   };
+  const insertImageButton = $('#insert-image-button');
+  const imageFileInput = $('#image-file-input');
+  const removeImageButton = $('#remove-image-button');
+  const imageEditor = window.createSlideImageEditor({
+    canvas: $('#canvas'), slides, storeKey, getSlide: () => slides[current], announce,
+    onSelectionChange: selected => { removeImageButton.hidden = !selected; }
+  });
   function fit() {
     const region = $('#stage-area'), style = getComputedStyle(region);
     const width = region.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
@@ -269,6 +648,7 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     $('#frame').style.width = 1920 * scale + 'px';
     $('#frame').style.height = 1080 * scale + 'px';
     $('#canvas').style.transform = `scale(${scale})`;
+    $('#canvas').style.setProperty('--image-control-unit', (1 / scale) + 'px');
   }
   function chapterFor(index) {
     const entries = $$('.chapters button');
@@ -284,6 +664,7 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
   function go(index, updateHash = true) {
     index = Math.max(0, Math.min(slides.length - 1, index));
     if (!Number.isFinite(index)) return;
+    if (index !== current) imageEditor.clearSelection();
     slides.forEach((slide, n) => {
       slide.setAttribute('aria-hidden', n === index ? 'false' : 'true');
       slide.inert = n !== index;
@@ -328,11 +709,14 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     editing = !editing;
     if (editing) setWorkbench(true);
     document.body.classList.toggle('edit-mode', editing);
+    imageEditor.setEditing(editing);
     $('#edit-button').setAttribute('aria-pressed', String(editing));
-    $('#edit-label').textContent = editing ? '结束编辑' : '编辑文字';
+    const label = editing ? '结束编辑' : '编辑页面';
+    $('#edit-label').textContent = label;
+    $('#edit-button').setAttribute('aria-label', label);
     $$('[data-editable]').forEach(el => { el.contentEditable = editing ? 'true' : 'false'; el.spellcheck = false; });
     refreshNotes();
-    if (editing) announce('点击页面文字即可修改；完成后点“保存HTML”。');
+    if (editing) announce('点击文字可修改，拖动新插入的图片可调整位置。');
   }
   function saveEdits() {
     const values = {};
@@ -348,7 +732,9 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     saveButton.disabled = true;
     try {
     if (!notePanel.hidden && editing) saveNote();
+    await imageEditor.settled();
     const clone = document.documentElement.cloneNode(true);
+    imageEditor.prepareExport(clone);
     const body = $('body', clone);
     body.classList.remove('edit-mode', 'presentation-mode', 'show-hint', 'workbench-open');
     body.dataset.start = String(current + 1);
@@ -364,7 +750,9 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     $('#notes-content', clone).contentEditable = 'false';
     $('#zoom-image', clone).removeAttribute('src');
     $('#edit-button', clone).setAttribute('aria-pressed', 'false');
-    $('#edit-label', clone).textContent = '编辑文字';
+    $('#edit-label', clone).textContent = '编辑页面';
+    $('#edit-button', clone).setAttribute('aria-label', '编辑页面');
+    $('#remove-image-button', clone).hidden = true;
     $('#notes-button', clone).setAttribute('aria-pressed', 'false');
     // The hosted edition loads media separately. Embed those files in a download
     // so the saved document remains usable when moved or opened offline.
@@ -393,7 +781,7 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     const url = URL.createObjectURL(blob), link = document.createElement('a');
     link.href = url; link.download = '实习分享会_已修改.html'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    announce('已下载HTML，修改的文字和讲稿已一起保存。');
+    announce('已下载HTML，文字、讲稿和插入的图片都已保存。');
     } catch {
       announce('素材暂时未能打包，请保持网络连接后重新保存。');
     } finally { saveButton.disabled = false; }
@@ -411,6 +799,7 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     clearTimeout(hintTimer); hintTimer = setTimeout(() => document.body.classList.remove('show-hint'), 2200);
   }
   async function togglePresent() {
+    if (!presenting && editing) toggleEdit();
     presenting = !presenting;
     document.body.classList.toggle('presentation-mode', presenting);
     $('#fullscreen-button').setAttribute('aria-pressed', String(presenting));
@@ -476,6 +865,23 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
   $('#close-notes').addEventListener('click', toggleNotes);
   $('#fullscreen-button').addEventListener('click', togglePresent);
   $('#edit-button').addEventListener('click', toggleEdit);
+  let imageTarget;
+  insertImageButton.addEventListener('click', () => {
+    imageTarget = slides[current];
+    imageFileInput.value = '';
+    imageFileInput.click();
+  });
+  imageFileInput.addEventListener('change', async () => {
+    const file = imageFileInput.files[0];
+    if (!file) return;
+    if (!editing) toggleEdit();
+    try {
+      await imageEditor.insert(file, imageTarget || slides[current]);
+    } catch {
+      announce('图片未能打开，请选择PNG、JPG、WebP或GIF图片重试。');
+    }
+  });
+  removeImageButton.addEventListener('click', () => imageEditor.removeSelected());
   $('#save-button').addEventListener('click', saveHTML);
   $('#help-button').addEventListener('click', () => showModal('help-modal'));
   pageInput.max = slides.length;
@@ -538,6 +944,7 @@ JD就是岗位说明。这里是当时举例的“前端开发实习生—抖音
     document.execCommand('insertText', false, value);
   });
   document.addEventListener('keydown', event => {
+    if (event.defaultPrevented) return;
     const modal = $$('.modal').find(el => !el.hidden);
     if (event.key === 'Escape') {
       if (modal) { event.preventDefault(); closeModal(); return; }
